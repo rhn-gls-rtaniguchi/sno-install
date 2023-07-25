@@ -13,6 +13,7 @@
       role: SNO
       cluster: sno1
       online: yes
+      
   roles:
     - role: prep-f0
       tags: f0 

@@ -72,8 +72,8 @@
 
 # pxe new-config config
 - name: Publish default PXE configuration file
-  copy:
-    src: files/default-uefi-config
+  template:
+    src: default-uefi-config.j2
     dest: /var/lib/tftpboot/pxelinux.cfg/default-foundation
     mode: 0644
     owner: root

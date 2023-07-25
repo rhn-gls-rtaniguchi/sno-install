@@ -1,10 +1,10 @@
 $TTL  1D
-ilt.example.com. IN  SOA dns.ocp4.ilt.example.com. foundation0.ilt.example.com. root.foundation0.ilt.example.com. (
+ilt.example.com. IN  foundation0.ilt.example.com. root.foundation0.ilt.example.com. (
                                 2015071700      ; serial number
                                 1H              ; refresh slave
                                 5M              ; retry query
                                 1W              ; expire
-                                1M              ; negative TTL 
+                                1M              ; negative TTL
 )
 ; BEGIN STATIC OCP4 ZONE RECORDS
 ; owner                 TTL     CL  type                RDATA

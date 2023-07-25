@@ -40,8 +40,8 @@
 - name: Create symlink for PXE boot
   file:
     state: link
-    src: "{{ images_directory }}/{{ rhcos_kernel_url }}"
-    dest: /var/lib/tftpboot/{{ rhcos_kernel_url }}
+    src: "{{ images_directory }}/{{ rhcos_kernel_file }}"
+    dest: /var/lib/tftpboot/
 
 - name: Download RHCOS initramfs
   get_url:

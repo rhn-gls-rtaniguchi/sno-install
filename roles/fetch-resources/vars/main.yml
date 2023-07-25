@@ -1,4 +1,3 @@
----
 openshift_mirror: "https://mirror.openshift.com/pub/openshift-v4"
 
 tools:
@@ -18,11 +17,14 @@ tools:
     url: "{{ openshift_mirror }}/clients/coreos-installer/{{ cinst_ver }}/coreos-installer_amd64"
     bin: "coreos-installer-{{ cinst_ver }}-linux-x86_64"
 
-rhcos_iso_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live.x86_64.iso"
-rhcos_rootfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img"
-rhcos_kernel_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64"
-rhcos_initramfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img"
+rhcos_iso_file: "rhcos-{{ rhcos_ver }}-x86_64-live.x86_64.iso"
+rhcos_iso_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/{{ rhcos_iso_file }}"
+rhcos_rootfs_file: "rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img"
+rhcos_rootfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/{{ rhcos_rootfs_file }}"
+rhcos_kernel_file: "rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64"
+rhcos_kernel_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/{{ rhcos_kernel_file }}"
+rhcos_initramfs_file: "rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img"
+rhcos_initramfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/{{rhcos_initramfs_file }}"
 
 binaries_directory: /var/www/html/openshift4/binaries/
 images_directory: /var/www/html/openshift4/images/
-...

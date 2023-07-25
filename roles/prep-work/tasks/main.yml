@@ -74,6 +74,11 @@
   args:
     chdir: /home/kiosk/{{ node.cluster }}
 
+- name: Create directory for the ignition files
+  ansible.builtin.file:
+    state: directory
+    src: "{{ignitions_directory }}"
+
 - name: Publish ignition configs
   copy:
     src: /home/kiosk/{{ node.cluster }}/bootstrap-in-place-for-live-iso.ign

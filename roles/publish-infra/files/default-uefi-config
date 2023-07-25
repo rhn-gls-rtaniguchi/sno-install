@@ -1,0 +1,12 @@
+default vesamenu.c32
+#prompt 1
+timeout 600
+
+display boot.msg
+
+menu background splash.jpg
+menu title Welcome to Global Learning Services Setup!
+
+label Env not configured yet
+    kernel /foo
+

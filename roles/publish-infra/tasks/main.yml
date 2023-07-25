@@ -70,6 +70,15 @@
     owner: root
     group: root
 
+# pxe new-config config
+- name: Publish default PXE configuration file
+  copy:
+    src: files/default-uefi-config
+    dest: /var/lib/tftpboot/pxelinux.cfg/default-foundation
+    mode: 0644
+    owner: root
+    group: root
+
 - name: Make sure tftp.socket is enabled
   service:
     name: tftp.socket

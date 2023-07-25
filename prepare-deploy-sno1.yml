@@ -1,6 +1,6 @@
 ---
 - name: Prepare the foundation0 machine for deployment of SNO1 cluster
-  hosts: foundation0.ilt.example.com
+  hosts: localhost
   become: true
   gather_facts: false
   vars:

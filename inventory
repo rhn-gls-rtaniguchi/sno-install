@@ -1,0 +1,10 @@
+foundation0.example.com ansible_user=kiosk
+
+# Example: override variables here.
+[all:vars]
+ocp_maj = "4.9"
+ocp_z = "4.9.23"
+rhcos_ver = "4.9.0"
+cinst_ver = latest
+butane_ver = latest
+

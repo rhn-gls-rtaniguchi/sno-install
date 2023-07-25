@@ -1,0 +1,27 @@
+---
+- name: Prepare the foundation0 machine for deployment of SNO1 cluster
+  hosts: foundation0.ilt.example.com
+  become: true
+  gather_facts: false
+  vars:
+    node:
+    #Update to an address that is part of the UCF physical environment.
+      ip: 172.25.250.10
+      #Update to use the MAC address from your own SNO host
+      mac: 01-52-54-00-00-32-12
+      name: node
+      role: SNO
+      cluster: sno1
+      online: yes
+  roles:
+    - role: prep-f0
+      tags: f0 
+    - role: check-env
+      tags: check
+    - role: publish-infra
+      tags: infra
+    - role: deploy-infra
+      tags: infra
+    - role: prep-work
+      tags: prep
+...

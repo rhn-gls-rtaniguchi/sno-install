@@ -1,0 +1,26 @@
+$TTL  1D
+ilt.example.com. IN  SOA dns.ocp4.ilt.example.com. foundation0.ilt.example.com. root.foundation0.ilt.example.com. (
+                                2015071700      ; serial number
+                                1H              ; refresh slave
+                                5M              ; retry query
+                                1W              ; expire
+                                1M              ; negative TTL 
+)
+; BEGIN STATIC OCP4 ZONE RECORDS
+; owner                 TTL     CL  type                RDATA
+@                               IN  NS          dns.ocp4.ilt.example.com.
+@                               IN  MX          10  foundation0.ilt.example.com.
+
+ilt.example.com.                IN  A           172.25.254.250
+foundation0.ilt.example.com.    IN  A           172.25.254.250
+training.ilt.example.com.       CNAME           foundation0.ilt.example.com.
+$GENERATE 1-200 foundation$     A 172.25.254.$
+$GENERATE 0-200 f$              CNAME           foundation$.ilt.example.com.
+jegui.ilt.example.com.          IN  A           172.25.254.252
+api								IN 	A 			172.25.254.254
+api-int							IN 	A 			172.25.254.254
+*.apps							IN 	A 			172.25.254.254
+; END STATIC OCP4 ZONE RECORDS
+
+; BEGIN DYNAMIC OCP4 ZONE RECORDS
+; END DYNAMIC OCP4 ZONE RECORDS

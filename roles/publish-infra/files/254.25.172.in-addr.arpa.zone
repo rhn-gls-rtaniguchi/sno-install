@@ -1,0 +1,29 @@
+$TTL  1D
+;@	IN  SOA dns.ocp4.example.com. root.example.com. (
+@  IN  SOA dns.ocp4.ilt.example.com. foundation0.ilt.example.com. root.foundation0.ilt.example.com. (
+								2019022400  ; serial
+								3h	   		; refresh
+								15	   		; retry
+								1w	   		; expire
+								3h	   		; minimum
+)
+   IN  NS dns.ocp4.example.com.
+
+; BEGIN STATIC 50 rZONE RECORDS
+; owner                 TTL     CL  type        RDATA
+@								IN	 NS 		dns.ocp4.ilt.example.com.
+;@                               IN  NS          foundation0.ilt.example.com.
+$GENERATE       1-200   		$  	PTR    		foundation$.ilt.example.com.
+250                             IN  PTR         foundation0.ilt.example.com.
+252                             IN  PTR         jegui.ilt.example.com.
+254                             IN  PTR         classroom.example.com.
+; OCP4 config
+254								IN  PTR 		api.ocp4.ilt.example.com.
+9								IN 	PTR 		bootstrap.ocp4.ilt.example.com. 
+10								IN 	PTR 		master01.ocp4.ilt.example.com. 
+11								IN 	PTR 		master02.ocp4.ilt.example.com. 
+12								IN 	PTR 		master03.ocp4.ilt.example.com. 
+; END STATIC 50 rZONE RECORDS
+
+; BEGIN DYNAMIC 50 rZONE RECORDS
+; END DYNAMIC 50 rZONE RECORDS

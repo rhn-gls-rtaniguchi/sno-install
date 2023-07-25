@@ -1,0 +1,17 @@
+---
+binaries_directory: /var/www/html/openshift4/binaries/
+images_directory: /var/www/html/openshift4/images/
+
+tools:
+  oc:
+    bin: "openshift-client-{{ ocp_z }}-linux-x86_64.tar.gz"
+
+  openshift_install:
+    bin: "openshift-install-{{ ocp_z }}-linux-x86_64.tar.gz"
+
+  butane:
+    bin: "butane-{{ butane_ver }}-linux-x86_64"
+
+  rhcos_inst:
+    bin: "coreos-installer-{{ cinst_ver }}-linux-x86_64"
+...

@@ -1,0 +1,99 @@
+# Deploying:
+#  - PXE config
+#  - install-config.yaml
+#  - network customization
+#
+# REQUIRES:
+#  - variable "node" according to vms structure
+#
+# Publish PXE config stuff
+- name: Deploy PXE config file
+  template:
+    src: templates/pxe-sno.j2
+    dest: /var/lib/tftpboot/pxelinux.cfg/{{ node.cluster }}-{{ node.name }}
+
+- name: Create symbolic link to PXE boot entry
+  file:
+    path: /var/lib/tftpboot/pxelinux.cfg/{{ node.mac }}
+    src: "{{ node.cluster }}-{{ node.name }}"
+    state: link
+
+# Create the OCP installation directory and populate it
+- name: Make sure workdir exists
+  become: false
+  file:
+    path: /home/kiosk/{{ node.cluster }}
+    state: directory
+    mode: 0755
+    owner: kiosk
+    group: kiosk
+
+- name: Place the install config to workdir
+  become: false
+  template:
+    src: templates/install-config-sno.yaml.j2
+    dest: /home/kiosk/{{ node.cluster }}/install-config.yaml
+    mode: 0644
+    owner: kiosk
+    group: kiosk
+
+- name: Create a backup copy of install config
+  become: false
+  copy:
+    src: /home/kiosk/{{ node.cluster }}/install-config.yaml
+    dest: /home/kiosk/install-config-{{ node.cluster }}.yaml
+    remote_src: yes
+    mode: 0644
+    owner: kiosk
+    group: kiosk
+
+- name: Create installation manifests
+  become: false
+  shell: openshift-install create manifests
+  args:
+    chdir: /home/kiosk/{{ node.cluster }}
+
+- name: Deploy the network config customization
+  become: false
+  template:
+    src: templates/netcfg.bu.j2
+    dest: /home/kiosk/netcfg.bu
+    mode: 0644
+    owner: kiosk
+    group: kiosk
+
+- name: Process network config with butane
+  become: false
+  shell: butane netcfg.bu -o {{ node.cluster }}/openshift/01-master-network.yaml
+  args:
+    chdir: /home/kiosk
+
+- name: Create the ignition file
+  become: false
+  shell: openshift-install create single-node-ignition-config
+  args:
+    chdir: /home/kiosk/{{ node.cluster }}
+
+- name: Publish ignition configs
+  copy:
+    src: /home/kiosk/{{ node.cluster }}/bootstrap-in-place-for-live-iso.ign
+    dest: "{{ ignitions_directory }}/{{ node.cluster }}-{{ node.name }}.ign"
+    remote_src: yes
+    mode: 0644
+    owner: root
+    group: root
+
+# Create a backup copy of cluster auth files
+- name: Create a backup copy of cluster auth files
+  become: false
+  copy:
+    src: /home/kiosk/{{ node.cluster }}/auth/{{ item }}
+    dest: /home/kiosk/{{ item }}-{{ node.cluster }}
+    remote_src: yes
+    owner: kiosk
+    group: kiosk
+    mode: 0644
+  loop:
+  - kubeadmin-password
+  - kubeconfig
+

@@ -1,0 +1,17 @@
+$TTL  1D
+@	IN  SOA dns.ilt.example.com. root.ilt.example.com. (
+		2019022400 ; serial
+		3h	   ; refresh
+		15	   ; retry
+		1w	   ; expire
+		3h	   ; minimum
+		)
+		IN NS dns.ilt.example.com.
+
+api		IN A {{ node.ip }}
+api-int		IN A {{ node.ip }}
+*.apps		IN A {{ node.ip }}
+
+{{ node.name }} IN A {{ node.ip }}
+
+; End of {{ node.cluster }}.ilt.example.com.zone

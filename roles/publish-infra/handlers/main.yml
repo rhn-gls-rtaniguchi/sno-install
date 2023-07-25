@@ -1,0 +1,18 @@
+- name: reload_named
+  service:
+    name: named
+    enabled: yes
+    state: reloaded
+
+- name: restart_chronyd
+  service:
+    name: chronyd
+    enabled: yes
+    state: restarted
+
+- name: restart_dhcpd
+  service:
+    name: dhcpd
+    enabled: yes
+    state: restarted
+

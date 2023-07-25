@@ -1,0 +1,7 @@
+---
+ocp_maj: "4.9"
+ocp_z: "4.9.11"
+rhcos_ver: "4.9.0"
+cinst_ver: "latest"
+butane_ver: "latest"
+...

@@ -15,6 +15,8 @@
       online: yes
       
   roles:
+    - role: fetch-resources
+      tags: f0   
     - role: prep-f0
       tags: f0 
     - role: check-env

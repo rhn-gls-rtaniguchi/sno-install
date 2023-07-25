@@ -1,0 +1,28 @@
+---
+openshift_mirror: "https://mirror.openshift.com/pub/openshift-v4"
+
+tools:
+  oc:
+    url: "{{ openshift_mirror }}/clients/ocp/{{ ocp_z }}/openshift-client-linux-{{ ocp_z }}.tar.gz"
+    bin: "openshift-client-{{ ocp_z }}-linux-x86_64.tar.gz"
+
+  openshift_install:
+    url: "{{ openshift_mirror }}/clients/ocp/{{ ocp_z }}/openshift-install-linux-{{ ocp_z }}.tar.gz"
+    bin: "openshift-install-{{ ocp_z }}-linux-x86_64.tar.gz"
+
+  butane:
+    url: "{{ openshift_mirror }}/clients/butane/{{ butane_ver }}/butane-amd64"
+    bin: "butane-{{ butane_ver }}-linux-x86_64"
+
+  rhcos_inst:
+    url: "{{ openshift_mirror }}/clients/coreos-installer/{{ cinst_ver }}/coreos-installer_amd64"
+    bin: "coreos-installer-{{ cinst_ver }}-linux-x86_64"
+
+rhcos_iso_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live.x86_64.iso"
+rhcos_rootfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img"
+rhcos_kernel_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64"
+rhcos_initramfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img"
+
+binaries_directory: /var/www/html/openshift4/binaries/
+images_directory: /var/www/html/openshift4/images/
+...

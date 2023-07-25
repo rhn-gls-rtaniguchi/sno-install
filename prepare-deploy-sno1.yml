@@ -8,7 +8,7 @@
     #Update to an address that is part of the UCF physical environment.
       ip: 172.25.250.10
       #Update to use the MAC address from your own SNO host
-      mac: 01-52-54-00-00-32-12
+      mac: 00-e0-4c-98-00-02
       name: node
       role: SNO
       cluster: sno1

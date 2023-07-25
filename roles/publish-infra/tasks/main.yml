@@ -74,7 +74,7 @@
 - name: Publish default PXE configuration file
   template:
     src: default-uefi-config.j2
-    dest: /var/lib/tftpboot/grub.conf
+    dest: /var/lib/tftpboot/grub.cfg-foundation
     mode: 0644
     owner: root
     group: root

@@ -77,7 +77,7 @@
 - name: Create directory for the ignition files
   ansible.builtin.file:
     state: directory
-    src: "{{ignitions_directory }}"
+    path: "{{ignitions_directory }}"
 
 - name: Publish ignition configs
   copy:

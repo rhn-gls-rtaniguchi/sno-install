@@ -6,7 +6,7 @@
   vars:
     node:
     #Update to an address that is part of the UCF physical environment.
-      ip: 172.25.250.10
+      ip: 192.168.50.18
       #Update to use the MAC address from your own SNO host
       mac: 00-e0-4c-98-00-02
       name: node

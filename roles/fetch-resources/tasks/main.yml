@@ -37,14 +37,21 @@
     url: "{{ rhcos_kernel_url }}"
     dest: "{{ images_directory }}"
 
-- name: Create symlink for PXE boot
+- name: Create kernel symlink for PXE boot
   become: true
   file:
     state: link
     src: "{{ images_directory }}/{{ rhcos_kernel_file }}"
-    dest: "/var/lib/tftpboot/{{ rhcos_kernel_file }}"
+    dest: "/var/lib/tftpboot/vmlinuz-coreos"
 
 - name: Download RHCOS initramfs
   get_url:
     url: "{{ rhcos_initramfs_url }}"
     dest: "{{ images_directory }}"
+
+- name: Create initramfs symlink for PXE boot
+  become: true
+  file:
+    state: link
+    src: "{{ images_directory }}/{{ rhcos_initramfs_file }}"
+    dest: "/var/lib/tftpboot/initrd-coreos.img"

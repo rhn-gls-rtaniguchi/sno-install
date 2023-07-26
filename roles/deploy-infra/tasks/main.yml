@@ -2,6 +2,7 @@
 #
 # - DNS zone files
 # - DNS zone configuration
+# - bastion zone delegation
 # - DHCP server modifications
 #
 # REQUIRES:
@@ -10,7 +11,7 @@
 - name: Publish forward DNS zone
   template:
     src: templates/sno.zone.j2
-    dest: /var/named/{{ node.cluster }}.ilt.example.com.zone
+    dest: /var/named/{{ node.cluster }}.example.com.zone
     mode: 0640
     owner: root
     group: named
@@ -21,23 +22,23 @@
   lineinfile:
     path: /etc/named.conf
     insertafter: "^# BEGIN ANSIBLE MANAGED DNS ZONES$"
-    regexp: '^zone "{{ node.cluster }}.ilt.example.com"'
-    line: 'zone "{{ node.cluster }}.ilt.example.com" { type master; file "{{ node.cluster }}.ilt.example.com.zone"; allow-update { none; }; };'
+    regexp: '^zone "{{ node.cluster }}.example.com"'
+    line: 'zone "{{ node.cluster }}.example.com" { type master; file "{{ node.cluster }}.example.com.zone"; allow-update { none; }; };'
     state: present
   notify:
   - reload_named
 
 - name: Update reverse DNS zone
   lineinfile:
-    path: /var/named/254.25.172.in-addr.arpa.zone
+    path: /var/named/50.168.192.in-addr.arpa.zone
     insertafter: "^; BEGIN DYNAMIC 50 rZONE RECORDS$"
-    regexp: "^{{ node.ip | regex_replace('^172.25.254.', '') }}"
-    line: "{{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.ilt.example.com."
+    regexp: "^{{ node.ip | regex_replace('^192.168.50.', '') }}"
+    line: "{{ node.ip | regex_replace('^192.168.50.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."
     state: present
   register: zoneupdate
 
 - name: Extract the serial if rzone was updated
-  shell: grep -i serial /var/named/254.25.172.in-addr.arpa.zone | awk '{ print $1 }'
+  shell: grep -i serial /var/named/50.168.192.in-addr.arpa.zone | awk '{ print $1 }'
   register: rzone_serial_result
   when: zoneupdate.changed
 
@@ -48,7 +49,7 @@
 
 - name: Update the serial number of reverse DNS zone
   lineinfile:
-    path: /var/named/254.25.172.in-addr.arpa.zone
+    path: /var/named/50.168.192.in-addr.arpa.zone
     regexp: "(?i); serial"
     line: "\t\t{{ rzone_serial }} ; serial"
     state: present
@@ -61,6 +62,6 @@
     path: /etc/dhcp/dhcpd.conf
     insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
     regexp: "(?i)hardware ethernet {{ node.mac | regex_replace('^01-', '') | regex_replace('-', ':') }}"
-    line: 'host {{ node.name }}-{{ node.cluster }} { hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; fixed-address {{ node.ip }}; option host-name "{{ node.name }}.{{ node.cluster }}.ilt.example.com"; option domain-name "{{ node.cluster }}.ilt.example.com"; option domain-search "{{ node.cluster }}.ilt.example.com"; }'
+    line: 'host {{ node.name }}-{{ node.cluster }} { hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; fixed-address {{ node.ip }}; option host-name "{{ node.name }}.{{ node.cluster }}.example.com"; option domain-name "{{ node.cluster }}.example.com"; option domain-search "{{ node.cluster }}.example.com"; }'
     state: present
   notify: restart_dhcpd

@@ -18,6 +18,17 @@
     src: "{{ node.cluster }}-{{ node.name }}"
     state: link
 
+- name: Deploy GRUB config file
+  template:
+    src: templates/grub-sno.j2
+    dest: /var/lib/tftpboot/grub.cfg-{{ node.cluster }}-{{ node.name }}
+
+- name: Create symbolic link to GRUB entry
+  file:
+    path: /var/lib/tftpboot/grub.cfg
+    src: "grub.cfg-{{ node.cluster }}-{{ node.name }}"
+    state: link
+
 # Create the OCP installation directory and populate it
 - name: Make sure workdir exists
   become: false

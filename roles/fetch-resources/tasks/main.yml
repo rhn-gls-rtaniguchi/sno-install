@@ -9,6 +9,7 @@
   loop:
   - "{{ binaries_directory }}"
   - "{{ images_directory }}"
+  - "{{ symlink_directory }}"
 
 # Downloads often fail ("handshake timed out" blabla) so do them first.
 - name: Download tools
@@ -32,6 +33,13 @@
     url: "{{ rhcos_rootfs_url }}"
     dest: "{{ images_directory }}"
 
+- name: Create rootfs symlink for PXE boot
+  become: true
+  file:
+    state: link
+    src: "{{ images_directory }}/{{ rhcos_rootfs_file }}"
+    dest: "{{ symlink_directory }}/rootfs-coreos"
+
 - name: Download RHCOS kernel
   get_url:
     url: "{{ rhcos_kernel_url }}"
@@ -42,7 +50,7 @@
   file:
     state: link
     src: "{{ images_directory }}/{{ rhcos_kernel_file }}"
-    dest: "/var/lib/tftpboot/vmlinuz-coreos"
+    dest: "{{ symlink_directory }}/vmlinuz-coreos"
 
 - name: Download RHCOS initramfs
   get_url:
@@ -54,4 +62,4 @@
   file:
     state: link
     src: "{{ images_directory }}/{{ rhcos_initramfs_file }}"
-    dest: "/var/lib/tftpboot/initrd-coreos.img"
+    dest: "{{ symlink_directory }}/initrd-coreos.img"

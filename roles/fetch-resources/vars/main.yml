@@ -28,3 +28,4 @@ rhcos_initramfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{
 
 binaries_directory: /var/www/html/openshift4/binaries/
 images_directory: /var/www/html/openshift4/images/
+symlink_directory: /var/lib/tftpboot/coreos/

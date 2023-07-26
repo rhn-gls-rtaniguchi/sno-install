@@ -27,7 +27,7 @@
     group: named
     backup: yes
   loop:
-  - ocp4.ilt.example.com
+  - ocp4.example.com
   - 172.25.254.arpa
 
 - name: Configure DNS to load the published zones

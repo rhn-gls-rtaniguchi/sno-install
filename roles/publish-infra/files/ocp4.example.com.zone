@@ -1,23 +1,20 @@
 $TTL  1D
-@	IN  SOA dns.ocp4.example.com. root.example.com. (
-		2019022400 ; serial
-		3h	   ; refresh
-		15	   ; retry
-		1w	   ; expire
-		3h	   ; minimum
-		)
-		IN NS dns.ocp4.example.com.
+ocp4.example.com.	IN  SOA dns.ocp4.example.com. root.ocp4.example.com. (
+							2019022400 ; serial
+							3h	   ; refresh
+							15	   ; retry
+							1w	   ; expire
+							3h	   ; minimum
+)
+
+@						IN 	NS 	dns.ocp4.example.com.
 
 ; BEGIN STATIC OCP4 ZONE RECORDS
-dns		IN A 192.168.50.254
-api		IN A 192.168.50.254
-api-int		IN A 192.168.50.254
-*.apps		IN A 192.168.50.254
+dns					IN A 172.25.254.1
+api					IN A 172.25.254.1
+api-int				IN A 172.25.254.1
+*.apps				IN A 172.25.254.1
 
-bootstrap	IN A 192.168.50.9 
-master01	IN A 192.168.50.10 
-master02	IN A 192.168.50.11 
-master03	IN A 192.168.50.12 
 ; END STATIC OCP4 ZONE RECORDS
 
 ; BEGIN DYNAMIC OCP4 ZONE RECORDS

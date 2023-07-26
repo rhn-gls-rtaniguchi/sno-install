@@ -27,8 +27,8 @@
     group: named
     backup: yes
   loop:
-  - ocp4.example.com
-  - 50.168.192.in-addr.arpa
+  - ocp4.ilt.example.com
+  - 172.25.254.arpa
 
 - name: Configure DNS to load the published zones
   lineinfile:
@@ -39,7 +39,7 @@
     backup: yes
   loop:
   - ocp4.example.com
-  - 50.168.192.in-addr.arpa
+  - 172.25.254.arpa
   notify:
   - reload_named
 
@@ -47,8 +47,8 @@
 - name: Make sure chronyd is allowing time sync
   lineinfile:
     path: /etc/chrony.conf
-    line: "allow 192.168.50.0/24"
-    regexp: "^#?allow 192.168.*$"
+    line: "allow 172.25/16"
+    regexp: "^#?allow 172.25.*$"
     state: present
     backup: yes
   notify:

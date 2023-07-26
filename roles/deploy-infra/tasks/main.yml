@@ -30,15 +30,15 @@
 
 - name: Update reverse DNS zone
   lineinfile:
-    path: /var/named/50.168.192.in-addr.arpa.zone
+    path: /var/named/172.25.254.zone
     insertafter: "^; BEGIN DYNAMIC 50 rZONE RECORDS$"
-    regexp: "^{{ node.ip | regex_replace('^192.168.50.', '') }}"
-    line: "{{ node.ip | regex_replace('^192.168.50.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."
+    regexp: "^{{ node.ip | regex_replace('^172.25.254.', '') }}"
+    line: "{{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."
     state: present
   register: zoneupdate
 
 - name: Extract the serial if rzone was updated
-  shell: grep -i serial /var/named/50.168.192.in-addr.arpa.zone | awk '{ print $1 }'
+  shell: grep -i serial /var/named/172.25.254.zone | awk '{ print $1 }'
   register: rzone_serial_result
   when: zoneupdate.changed
 
@@ -49,7 +49,7 @@
 
 - name: Update the serial number of reverse DNS zone
   lineinfile:
-    path: /var/named/50.168.192.in-addr.arpa.zone
+    path: /var/named/172.25.254.zone
     regexp: "(?i); serial"
     line: "\t\t{{ rzone_serial }} ; serial"
     state: present

@@ -1,36 +1,85 @@
 ---
 - name: Creating a PXE boot server
-  hosts: localhost
+  hosts: default
   become: true
   tasks:
-  - name: Description
+  - name: Install tools
     ansible.builtin.yum:
       name:
       - dnsmasq
       - httpd
       - syslinux
       - tftp-server
+      - dhcp-server
       state: present
+  
+  - name: Create directory to store bootloader files
+    vars:
+      files_bios: 
+        - pxelinux.0
+        - menu.c32
+        - vesamenu.c32
+        - ldlinux.c32 
+        - libcom32.c32 
+        - libutil.c32
+    ansible.builtin.copy:
+      dest: /var/lib/tftpboot/
+      src: "/usr/share/syslinux/{{ item }}"
+      remote_src: true
+    loop: "{{ files_bios }}"
+
+
+  - name: Download UEFI bootloader images
+    ansible.builtin.yum:
+      name:
+      - shim-x64
+      - grub2-efi-x64
+      installroot: /tmp/fedora
+
+  - name: Create directory to store bootloaders
+    ansible.builtin.file:
+      path: /var/lib/tftpboot/uefi
+      state: directory
+
+  - name: Copy UEFI bootloaders
+    vars:
+      files_uefi: 
+        - shimx64.efi
+        - grubx64.efi
+    ansible.builtin.copy:
+      src: /tmp/fedora/boot/efi/EFI/fedora/{{ item }}
+      dest: /var/lib/tftpboot/uefi
+      remote_src: true
+    loop: "{{files_uefi}}"
+
+
+
+  - name: Copy DHCP configuration files
+    ansible.builtin.copy:
+      src: files/dhcpd.conf
+      dest: /etc/dhcp/dhcpd.conf
+
   - name: Create directory to host images
     ansible.builtin.file:
       group: apache
       mode: "0755"
       owner: apache
       path: /var/www/html/openshift4
-      state: present
-  - name: Enable and Enable HTTP server
+      state: directory
+
+    
+  - name: Enable HTTP server
+    vars:
+      services: 
+        - httpd
+        - tftp
+        - dhcpd
     ansible.builtin.service:
       enabled: true
-      name: httpd
+      name: "{{ item }}"
       state: started
-  - name: Save configuration files
-    ansible.builtin.copy:
-      src: /usr/share/syslinux/*
-      dest: /var/lib/tftpboot
-      force: true
-      remote_src: true
+    loop: "{{services}}"
 
 
- 
 
   

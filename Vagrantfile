@@ -9,6 +9,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = "fedora/38-cloud-base"
   config.vm.box_version = "38.20230413.1"
+  config.vm.hostname = "dns.example.com"
+  config.vm.network "private_network", ip: "192.168.56.254"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -50,13 +52,10 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
+      vb.memory = "1024"
   end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
 
-  config.vm.provision "ansible" do |ansible|
+  config.vm.provision "ansible_local" do |ansible|
     ansible.verbose = "v"
     ansible.playbook = "playbook.yml"
   end

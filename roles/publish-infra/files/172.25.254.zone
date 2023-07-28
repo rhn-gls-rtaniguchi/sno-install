@@ -9,13 +9,13 @@ $TTL  1D
 
 ; owner                 TTL     CL  type        RDATA
 @                               IN  NS          foundation0.ilt.example.com.
-1						        IN  PTR     	ocp4.example.com.
+2						        IN  PTR     	ocp4.example.com.
 250                             IN  PTR         foundation0.ilt.example.com.
 252                             IN  PTR         jegui.ilt.example.com.
 254                             IN  PTR         classroom.example.com.
 
 ; BEGIN STATIC 50 rZONE RECORDS
-1								IN 	PTR 		api.ocp4.example.com.
+2								IN 	PTR 		api.ocp4.example.com.
 9								IN 	PTR 		bootstrap.ocp4.example.com. 
 10								IN 	PTR 		master01.ocp4.example.com. 
 11								IN 	PTR 		master02.ocp4.example.com. 

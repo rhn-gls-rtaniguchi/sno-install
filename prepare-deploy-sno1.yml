@@ -9,6 +9,7 @@
       ip: 172.25.254.1
       #Update to use the MAC address from your own SNO host
       mac: a0-ce-c8-3a-90-37
+      #mac: 00-e0-4c-98-00-02
       name: node
       role: SNO
       cluster: sno1

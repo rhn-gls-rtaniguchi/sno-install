@@ -14,7 +14,7 @@
 
 - name: Create symbolic link to PXE boot entry
   file:
-    path: /var/lib/tftpboot/pxelinux.cfg/{{ node.mac }}
+    path: /var/lib/tftpboot/pxelinux.cfg/default
     src: "{{ node.cluster }}-{{ node.name }}"
     state: link
 

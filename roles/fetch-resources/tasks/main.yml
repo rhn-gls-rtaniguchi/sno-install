@@ -50,7 +50,7 @@
   file:
     state: link
     src: "{{ images_directory }}/{{ rhcos_kernel_file }}"
-    dest: "{{ symlink_directory }}/vmlinuz-coreos"
+    dest: "{{ symlink_directory }}/vmlinuz"
 
 - name: Download RHCOS initramfs
   get_url:
@@ -62,4 +62,4 @@
   file:
     state: link
     src: "{{ images_directory }}/{{ rhcos_initramfs_file }}"
-    dest: "{{ symlink_directory }}/initrd-coreos.img"
+    dest: "{{ symlink_directory }}/initrd.img"

@@ -1,0 +1,36 @@
+---
+- name: Creating a PXE boot server
+  hosts: localhost
+  become: true
+  tasks:
+  - name: Description
+    ansible.builtin.yum:
+      name:
+      - dnsmasq
+      - httpd
+      - syslinux
+      - tftp-server
+      state: present
+  - name: Create directory to host images
+    ansible.builtin.file:
+      group: apache
+      mode: "0755"
+      owner: apache
+      path: /var/www/html/openshift4
+      state: present
+  - name: Enable and Enable HTTP server
+    ansible.builtin.service:
+      enabled: true
+      name: httpd
+      state: started
+  - name: Save configuration files
+    ansible.builtin.copy:
+      src: /usr/share/syslinux/*
+      dest: /var/lib/tftpboot
+      force: true
+      remote_src: true
+
+
+ 
+
+  

@@ -27,6 +27,5 @@ rhcos_initramfs_file: "rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img"
 rhcos_initramfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{ rhcos_ver }}/{{rhcos_initramfs_file }}"
 
 binaries_directory: /var/www/html/openshift4/binaries/
-images_directory: /content/openshift4/images/
-#images_directory: /var/www/html/openshift4/images/
+images_directory: /var/www/html/openshift4/images/
 symlink_directory: /var/lib/tftpboot/coreos/

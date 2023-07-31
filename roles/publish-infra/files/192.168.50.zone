@@ -1,5 +1,5 @@
 $TTL  1D
-254.25.172.IN-ADDR.ARPA. IN  SOA foundation0.ilt.example.com. root.foundation0.ilt.example.com. (
+192.168.50.IN-ADDR.ARPA. IN  SOA sno1.example.com. root.sno1.example.com. (
 								2019022400 ; serial
 								3h	   ; refresh
 								15	   ; retry
@@ -8,10 +8,9 @@ $TTL  1D
 )
 
 ; owner                 TTL     CL  type        RDATA
-@                               IN  NS          foundation0.ilt.example.com.
+@                               IN  NS          sno1.example.com.
 2						        IN  PTR     	ocp4.example.com.
-250                             IN  PTR         foundation0.ilt.example.com.
-252                             IN  PTR         jegui.ilt.example.com.
+250                             IN  PTR         dns.example.com.
 254                             IN  PTR         classroom.example.com.
 
 ; BEGIN STATIC 50 rZONE RECORDS

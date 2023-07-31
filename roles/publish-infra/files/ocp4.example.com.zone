@@ -10,10 +10,10 @@ ocp4.example.com.	IN  SOA dns.ocp4.example.com. root.ocp4.example.com. (
 @						IN 	NS 	dns.ocp4.example.com.
 
 ; BEGIN STATIC OCP4 ZONE RECORDS
-dns					IN A 172.25.254.2
-api					IN A 172.25.254.2
-api-int				IN A 172.25.254.2
-*.apps				IN A 172.25.254.2
+dns					IN A 192.168.50.2
+api					IN A 192.168.50.2
+api-int				IN A 192.168.50.2
+*.apps				IN A 192.168.50.2
 
 ; END STATIC OCP4 ZONE RECORDS
 

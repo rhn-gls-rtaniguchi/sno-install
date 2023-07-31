@@ -6,13 +6,14 @@
   - name: Install tools
     ansible.builtin.yum:
       name:
-      - dnsmasq
+      - bind
       - httpd
       - syslinux
       - tftp-server
       - dhcp-server
       state: present
-  
+
+ 
   - name: Create directory to store bootloader files
     vars:
       files_bios: 
@@ -52,12 +53,24 @@
       remote_src: true
     loop: "{{files_uefi}}"
 
-
-
-  - name: Copy DHCP configuration files
+  - name: Copy UEFI bootloaders
     ansible.builtin.copy:
-      src: files/dhcpd.conf
-      dest: /etc/dhcp/dhcpd.conf
+      src: /tmp/fedora/boot/efi/EFI/BOOT/BOOTX64.EFI
+      dest: /var/lib/tftpboot/uefi
+      remote_src: true
+
+  - name: Create directory to store bootloaders
+    ansible.builtin.file:
+      path: /var/lib/tftpboot/pxelinux.cfg
+      state: directory
+
+  - name: Download UEFI bootloader images
+    ansible.builtin.yum:
+      name:
+      - shim-x64
+      - grub2-efi-x64
+      installroot: /tmp/fedora
+
 
   - name: Create directory to host images
     ansible.builtin.file:
@@ -67,18 +80,16 @@
       path: /var/www/html/openshift4
       state: directory
 
-    
-  - name: Enable HTTP server
-    vars:
-      services: 
-        - httpd
-        - tftp
-        - dhcpd
-    ansible.builtin.service:
-      enabled: true
-      name: "{{ item }}"
-      state: started
-    loop: "{{services}}"
+
+  - name: Configure new interface
+    # Comment
+    community.general.nmcli:
+      autoconnect: true
+      conn_name: eth1
+      state: present
+      type: ethernet
+      ip4: 192.168.50.254
+
 
 
 

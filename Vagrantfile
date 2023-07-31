@@ -10,8 +10,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "fedora/38-cloud-base"
   config.vm.box_version = "38.20230413.1"
   config.vm.hostname = "dns.example.com"
-  config.vm.network "private_network", ip: "192.168.56.254"
-
+  # My network wifi adapter name: wlp1s0 (which provides internet access)
+  config.vm.network "public_network", bridge: "eno1"
+  
+  
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
@@ -25,12 +27,12 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
+  
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  config.vm.network "public_network"
+  
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -54,10 +56,17 @@ Vagrant.configure("2") do |config|
   #   # Customize the amount of memory on the VM:
       vb.memory = "1024"
   end
-
+  
   config.vm.provision "ansible_local" do |ansible|
     ansible.verbose = "v"
     ansible.playbook = "playbook.yml"
   end
+
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.verbose = "v"
+    ansible.playbook = "prepare-deploy-sno1.yml"
+  end
+
+
 end
 

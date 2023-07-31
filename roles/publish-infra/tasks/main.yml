@@ -28,7 +28,7 @@
     backup: yes
   loop:
   - ocp4.example.com
-  - 172.25.254
+  - 192.168.50
 
 - name: Configure DNS to load the published zones
   lineinfile:
@@ -39,7 +39,7 @@
     backup: yes
   loop:
   - ocp4.example.com
-  - 172.25.254
+  - 192.168.50
   notify:
   - reload_named
 
@@ -47,8 +47,8 @@
 - name: Make sure chronyd is allowing time sync
   lineinfile:
     path: /etc/chrony.conf
-    line: "allow 172.25/16"
-    regexp: "^#?allow 172.25.*$"
+    line: "allow 192.168/16"
+    regexp: "^#?allow 192.168.*$"
     state: present
     backup: yes
   notify:
@@ -70,12 +70,17 @@
 - name: Publish default PXE configuration file
   copy:
     src: files/default-pxe-config
-    dest: /var/lib/tftpboot/pxelinux.cfg/default
+    dest: /var/lib/tftpboot/pxelinux.cfg/default-ocp4
     mode: 0644
     owner: root
     group: root
     backup: yes
 
+- name: Create symlink to the default PXE config file
+  file:
+    src: /var/lib/tftpboot/pxelinux.cfg/default-pxe-config
+    dest: /var/lib/tftpboot/pxelinux.cfg/default
+    state: link
 # grub config
 - name: Publish default GRUB configuration file
   copy:

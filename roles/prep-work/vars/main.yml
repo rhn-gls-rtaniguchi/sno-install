@@ -1,6 +1,6 @@
 ignitions_directory: /var/www/html/openshift4/ignitions/
 
-boot_host: http://172.25.254.250
+boot_host: http://192.168.50.254
 
 ignitions_url: "{{ boot_host }}/openshift4/ignitions"
 binaries_url: "{{ boot_host }}/openshift4/binaries"

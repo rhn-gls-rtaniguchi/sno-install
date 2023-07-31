@@ -3,9 +3,9 @@
   become: false
   ansible.builtin.copy:
     src: files/pull-secret
-    dest: /home/kiosk/pull-secret
-    owner: kiosk
-    group: kiosk
+    dest: /home/vagrant/pull-secret
+    owner: vagrant
+    group: vagrant
     mode: 0600
 
 # Extract the binaries

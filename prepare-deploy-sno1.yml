@@ -1,20 +1,17 @@
 ---
 - name: Prepare the foundation0 machine for deployment of SNO1 cluster
-  hosts: localhost
+  hosts: default
   become: true
   gather_facts: false
   vars:
     node:
-    #Update to an address that is part of the UCF physical environment.
-      ip: 172.25.254.1
-      #Update to use the MAC address from your own SNO host
+      ip: 192.168.50.1
       mac: a0-ce-c8-3a-90-37
-      #mac: 00-e0-4c-98-00-02
       name: node
       role: SNO
       cluster: sno1
       online: yes
-      
+     
   roles:
     - role: fetch-resources
       tags: f0   

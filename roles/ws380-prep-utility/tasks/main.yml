@@ -1,12 +1,12 @@
 ---
 # Publish pull secret
-- name: Put the pull-secret onto utility VM
+- name: Put the pull-secret onto vagrant VM
   become: no
   ansible.builtin.copy:
     src: files/pull-secret
-    dest: /home/lab/pull-secret
-    owner: lab
-    group: lab
+    dest: /home/vagrant/pull-secret
+    owner: vagrant
+    group: vagrant
     mode: 0600
 
 # Extract the binaries

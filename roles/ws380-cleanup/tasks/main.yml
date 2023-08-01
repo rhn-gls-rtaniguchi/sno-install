@@ -50,14 +50,14 @@
     path: /var/www/html/openshift4/images/rhcos-4.6.8-x86_64-metal.x86_64.raw.gz
     state: absent
 
-# Cleanup - /home/lab/ocp4, /root/ocp4* (stale data)
+# Cleanup - /home/vagrant/ocp4, /root/ocp4* (stale data)
 - name: Remove old ocp4 directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
-    - /home/lab/ocp4
-    - /home/lab/sno1
+    - /home/vagrant/ocp4
+    - /home/vagrant/sno1
     - /root/ocp4
     - /root/ocp4upi
 

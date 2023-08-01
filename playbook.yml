@@ -11,10 +11,14 @@
       - syslinux
       - tftp-server
       - dhcp-server
-      - haproxy
       state: present
-
- 
+  - name: Change HTTPD configuration
+    # Comment
+    ansible.builtin.lineinfile:
+      regexp: "^Listen 80"
+      line: "Listen 8080"
+      path: /etc/httpd/conf/httpd.conf
+      
   - name: Create directory to store bootloader files
     vars:
       files_bios: 
@@ -79,6 +83,14 @@
       mode: "0755"
       owner: apache
       path: /var/www/html/openshift4
+      state: directory
+
+  - name: Create directory to host ignition files
+    ansible.builtin.file:
+      group: apache
+      mode: "0755"
+      owner: apache
+      path: /var/www/html/openshift4/ignitions
       state: directory
 
 

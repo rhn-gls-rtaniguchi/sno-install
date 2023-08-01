@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = "utility.lab.example.com"
   # My network wifi adapter name: wlp1s0 (which provides internet access)
   # My wired ethernet is eno1
-  config.vm.network "public_network", bridge: "eno1"
+  config.vm.network "public_network", bridge: "enp0s20f0u6u3u1"
   
   config.vm.synced_folder "../data", "/vagrant_data"
 

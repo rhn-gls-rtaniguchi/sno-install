@@ -1,0 +1,35 @@
+variant: openshift
+version: 4.9.0
+metadata:
+  name: 01-master-network-ens3
+  labels:
+    machineconfiguration.openshift.io/role: master
+storage:
+  files:
+    - path: /etc/NetworkManager/system-connections/ens3.nmconnection
+      mode: 0600
+      overwrite: true
+      contents:
+        inline: |
+          [connection]
+          id=ens3
+          type=ethernet
+          interface-name=ens3
+
+          [ethernet]
+          mtu=1500
+
+          [ipv4]
+          address1={{ node.ip }}/24,192.168.50.254
+          dns=192.168.50.254;
+          method=manual
+
+          [ipv6]
+          method=disabled
+
+    - path: /etc/hostname
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          {{ node.name }}.{{ node.cluster }}.example.com

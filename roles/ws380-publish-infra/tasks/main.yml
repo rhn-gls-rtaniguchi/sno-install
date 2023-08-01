@@ -42,17 +42,6 @@
     - reload_named
 
 
-# haproxy configuration
-- name: Publish base haproxy.cfg
-  copy:
-    src: files/haproxy.cfg
-    dest: /etc/haproxy/haproxy.cfg
-    mode: 0644
-    owner: root
-    group: root
-  notify:
-    - reload_haproxy
-
 # chronyd fixes
 - name: Make sure chronyd is allowing time sync
   lineinfile:

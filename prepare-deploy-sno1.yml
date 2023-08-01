@@ -4,10 +4,10 @@
   become: true
   gather_facts: false
   vars:
-    node:
-      ip: 192.168.50.18
-      mac: 01-52-54-00-00-32-12
+    node: 
       name: node
+      ip: 192.168.50.18
+      mac: 01-52-54-00-00-32-09
       role: SNO
       cluster: sno1
       online: yes
@@ -20,10 +20,12 @@
       tags: prep
     - role: ws380-publish-infra
       tags: publish
-    - role: deploy-ocp-cluster
-      tags:
-        - ocp4
-        - publish
+    - role: check-env
+      tags: check
+    - role: deploy-infra
+      tags: infra
+    - role: prep-work
+      tags: prep
   post_tasks:
     - name: Notify of completion
       pause:

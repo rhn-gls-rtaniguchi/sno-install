@@ -1,0 +1,93 @@
+---
+# DNS configuration
+- name: Remove stale zone files from default config
+  file:
+    path: /var/named/{{ item }}
+    state: absent
+  loop:
+    - ocp4.example.com.db
+    - ocp4.example.com.reverse.db
+
+- name: Publish base named.conf
+  copy:
+    src: files/named.conf
+    dest: /etc/named.conf
+    mode: 0640
+    owner: root
+    group: named
+  notify:
+    - reload_named
+
+- name: Publish base forward and reverse zones
+  copy:
+    src: files/{{ item }}.zone
+    dest: /var/named/{{ item }}.zone
+    mode: 0640
+    owner: root
+    group: named
+  loop:
+    - ocp4.example.com
+    - 50.168.192.in-addr.arpa
+
+- name: Configure DNS to load the published zones
+  lineinfile:
+    path: /etc/named.conf
+    insertafter: "^# BEGIN ANSIBLE MANAGED DNS ZONES$"
+    line: 'zone "{{ item }}" { type master; file "{{ item }}.zone"; allow-update { none; }; };'
+    state: present
+  loop:
+    - ocp4.example.com
+    - 50.168.192.in-addr.arpa
+  notify:
+    - reload_named
+
+
+# haproxy configuration
+- name: Publish base haproxy.cfg
+  copy:
+    src: files/haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload_haproxy
+
+# chronyd fixes
+- name: Make sure chronyd is allowing time sync
+  lineinfile:
+    path: /etc/chrony.conf
+    line: "allow 192.168.50.0/24"
+    regexp: "^#?allow 192.168.*$"
+    state: present
+  notify:
+    - restart_chronyd
+
+# dhcpd configuration
+- name: Publish base dhcpd.conf
+  copy:
+    src: files/dhcpd.conf
+    dest: /etc/dhcp/dhcpd.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - restart_dhcpd
+
+# pxe boot config
+- name: Publish default PXE configuration file
+  copy:
+    src: files/default-pxe-config
+    dest: /var/lib/tftpboot/pxelinux.cfg/default
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Make sure tftp.socket is enabled
+  service:
+    name: tftp.socket
+    enabled: yes
+
+
+
+...

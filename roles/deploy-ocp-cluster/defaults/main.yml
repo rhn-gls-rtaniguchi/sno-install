@@ -1,0 +1,102 @@
+---
+ocp_maj: "4.9"
+ocp_z: "4.9.11"
+rhcos_ver: "4.9.0"
+
+# Some example clusters you can define when invoking this role.
+#
+#clusters:
+#  ocp4:
+#    n_control: 3
+#    n_compute: 2
+#    is_openshift: yes
+#    customizations: {}
+#
+#    api_lb_ip: 192.168.50.254
+#    apps_lb_ip: 192.168.50.254
+#
+#    nodes:
+#      - name: bootstrap
+#        ip: 192.168.50.9
+#        mac: 01-52-54-00-00-32-09
+#        role: bootstrap
+#        cluster: ocp4
+#      - name: master01
+#        ip: 192.168.50.10
+#        mac: 01-52-54-00-00-32-0a
+#        role: master
+#        cluster: ocp4
+#      - name: master02
+#        ip: 192.168.50.11
+#        mac: 01-52-54-00-00-32-0b
+#        role: master
+#        cluster: ocp4
+#      - name: master03
+#        ip: 192.168.50.12
+#        mac: 01-52-54-00-00-32-0c
+#        role: master
+#        cluster: ocp4
+#      - name: infra01
+#        ip: 192.168.50.13
+#        mac: 01-52-54-00-00-32-0d
+#        role: worker
+#        cluster: ocp4
+#      - name: infra02
+#        ip: 192.168.50.14
+#        mac: 01-52-54-00-00-32-0e
+#        role: worker
+#        cluster: ocp4
+#
+#  sno1:
+#    n_control: 1
+#    n_compute: 0
+#    is_openshift: yes
+#    customizations: {}
+#
+#    api_lb_ip: 192.168.50.18
+#    apps_lb_ip: 192.168.50.18
+#
+#    nodes:
+#      - name: node
+#        ip: 192.168.50.18
+#        mac: 01-52-54-00-00-32-12
+#        role: SNO
+#        cluster: sno1
+#
+#  k3s:
+#    n_control: 1
+#    n_compute: 0
+#    is_openshift: no
+#    customizations: {}
+#
+#    api_lb_ip: 192.168.50.18
+#
+#    nodes:
+#      - name: node
+#        ip: 192.168.50.19
+#        mac: 01-52-54-00-00-32-1e
+#        role: K8S
+#        cluster: k3s
+#
+#  none:
+#    n_control: 1
+#    n_compute: 0
+#    is_openshift: no
+#    customizations: {}
+#
+#    api_lb_ip: 192.168.50.254
+#
+#    nodes:
+#      - mac: 01-52-54-00-00-32-0f
+#        name: worker01
+#        role: none
+#        cluster: none
+#      - mac: 01-52-54-00-00-32-10
+#        name: worker02
+#        role: none
+#        cluster: none
+#      - mac: 01-52-54-00-00-32-11
+#        name: worker03
+#        role: none
+#        cluster: none
+...

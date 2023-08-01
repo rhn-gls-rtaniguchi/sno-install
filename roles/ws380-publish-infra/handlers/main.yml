@@ -1,0 +1,37 @@
+---
+- name: reload_named
+  service:
+    name: named
+    enabled: yes
+    state: reloaded
+
+- name: reload_haproxy
+  service:
+    name: haproxy
+    enabled: yes
+    state: reloaded
+
+- name: restart_chronyd
+  service:
+    name: chronyd
+    enabled: yes
+    state: restarted
+
+- name: restart_dhcpd
+  service:
+    name: dhcpd
+    enabled: yes
+    state: restarted
+
+- name: reexport_nfs
+  command: /usr/sbin/exportfs -ar
+
+# XXX CAREFUL! This will delegate from anywhere to bastion but ASSUMES xX naming scheme!
+#               (i.e. w0 -> b0; u0 -> b0; foo0 -> boo0!!!)
+- name: restart_bastion_dnsmasq
+  delegate_to: "{{ inventory_hostname | regex_replace('^.', 'b') }}"
+  service:
+    name: dnsmasq
+    enabled: yes
+    state: restarted
+...

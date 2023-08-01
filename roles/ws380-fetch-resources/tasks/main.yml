@@ -1,0 +1,44 @@
+---
+# First make sure all target locations exist
+- name: Create the download directories if not there yet
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ binaries_directory }}"
+    - "{{ images_directory }}"
+
+# Downloads often fail ("handshake timed out" blabla) so do them first.
+- name: Download tools
+  get_url:
+    url: "{{ tools[item].url }}"
+    dest: "{{ binaries_directory }}/{{ tools[item].bin }}"
+  loop:
+    - oc
+    - openshift_install
+    - butane
+    - rhcos_inst
+
+- name: Download RHCOS live ISO
+  get_url:
+    url: "{{ rhcos_iso_url }}"
+    dest: "{{ images_directory }}"
+
+- name: Download RHCOS rootfs
+  get_url:
+    url: "{{ rhcos_rootfs_url }}"
+    dest: "{{ images_directory }}"
+
+- name: Download RHCOS kernel
+  get_url:
+    url: "{{ rhcos_kernel_url }}"
+    dest: "{{ images_directory }}"
+
+- name: Download RHCOS initramfs
+  get_url:
+    url: "{{ rhcos_initramfs_url }}"
+    dest: "{{ images_directory }}"
+...

@@ -1,28 +1,42 @@
 ---
-- name: Prepare the foundation0 machine for deployment of SNO1 cluster
+- name: Prepare the utility VM for deployment of SNO1 cluster
   hosts: default
   become: true
   gather_facts: false
   vars:
     node:
-      ip: 192.168.50.1
-      mac: a0-ce-c8-3a-90-37
+      ip: 192.168.50.18
+      mac: 01-52-54-00-00-32-12
       name: node
       role: SNO
       cluster: sno1
       online: yes
-     
   roles:
-    - role: fetch-resources
-      tags: f0   
-    - role: prep-f0
-      tags: f0 
-    - role: check-env
-      tags: check
-    - role: publish-infra
-      tags: infra
-    - role: deploy-infra
-      tags: infra
-    - role: prep-work
+    - role: ws380-cleanup
+      tags: cleanup
+    - role: ws380-fetch-resources
+      tags: fetch
+    - role: ws380-prep-utility
       tags: prep
+    - role: ws380-publish-infra
+      tags: publish
+    - role: deploy-ocp-cluster
+      tags:
+        - ocp4
+        - publish
+  post_tasks:
+    - name: Notify of completion
+      pause:
+        prompt: |
+          **********************************************************************
+          * THE WS380 CONFIGURATION ON UTILITY VMs IS NOW COMPLETE.            *
+          *                                                                    *
+          * Copies of kubeconfig and kubeadmin-password have been placed on    *
+          * the workstation VM, in the home directory of user student.         *
+          *                                                                    *
+          * You can now proceed with the deployment of other workshop-specific *
+          * settings by booting VMs and running other playbooks as per doc.    *
+          **********************************************************************
+        seconds: 1
 ...
+

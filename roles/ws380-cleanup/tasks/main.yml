@@ -1,0 +1,92 @@
+---
+# TODO: Add "obliterate" tasks.
+#
+# Cleanup - /var/lib/tftpboot/openshift4 (move initramfs and kernel to /var/www, remove dir)
+- name: Do the old images still exist?
+  ansible.builtin.stat:
+    path: /var/lib/tftpboot/openshift4/4.6.26/{{ item }}
+    get_checksum: no
+    get_mime: no
+    get_attributes: yes
+  loop:
+    - rhcos-4.6.8-x86_64-live-initramfs.x86_64.img
+    - rhcos-4.6.8-x86_64-live-kernel-x86_64
+  register: fstat
+
+- name: Move old images to correct location
+  ansible.builtin.command: mv /var/lib/tftpboot/openshift4/4.6.26/{{ item }} /var/www/html/openshift4/images/{{ item }}
+  loop:
+    - rhcos-4.6.8-x86_64-live-initramfs.x86_64.img
+    - rhcos-4.6.8-x86_64-live-kernel-x86_64
+  when: (fstat.results | items2dict(key_name = 'item', value_name = 'stat'))[item].exists
+
+- name: Remove the old image directory
+  ansible.builtin.file:
+    path: /var/lib/tftpboot/openshift4
+    state: absent
+
+# Cleanup - /var/lib/tftpboot/pxelinux.cfg (files only)
+# Cleanup - /var/www/html/openshift4/ignitions/ocp4 (files only - stale data!)
+- name: Get a list of pxelinux.cfg/ and ignitions/ contents
+  ansible.builtin.find:
+    paths:
+      - /var/lib/tftpboot/pxelinux.cfg
+      - /var/www/html/openshift4/ignitions
+    recurse: yes
+    file_type: file
+  register: fstat
+
+- name: Clean up old files (remove)
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ fstat.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+# Cleanup - /var/www/html/openshift4/images (remove metal image - NOTE the live-rootfs remains!)
+- name: Clean up old baremetal image (remove)
+  ansible.builtin.file:
+    path: /var/www/html/openshift4/images/rhcos-4.6.8-x86_64-metal.x86_64.raw.gz
+    state: absent
+
+# Cleanup - /home/lab/ocp4, /root/ocp4* (stale data)
+- name: Remove old ocp4 directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /home/lab/ocp4
+    - /home/lab/sno1
+    - /root/ocp4
+    - /root/ocp4upi
+
+# Cleanup - remove stale binaries
+- name: Remove currently active openshift binaries
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/bin/oc
+    - /usr/bin/kubectl
+    - /usr/local/bin/oc
+    - /usr/local/bin/kubectl
+    - /usr/bin/openshift-install
+    - /usr/local/bin/openshift-install
+    - /usr/bin/openshift-baremetal-install
+    - /usr/local/bin/openshift-baremetal-install
+    - /usr/bin/butane
+    - /usr/local/bin/butane
+    - /usr/bin/coreos-installer
+    - /usr/local/bin/coreos-installer
+
+# Cleanup - bash completion files
+- name: Remove currently active openshift completion files
+  ansible.builtin.file:
+    path: /etc/bash_completion.d/{{ item }}
+    state: absent
+  loop:
+    - oc
+    - openshift-install
+    - openshift-baremetal-install
+...

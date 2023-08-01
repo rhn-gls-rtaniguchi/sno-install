@@ -1,0 +1,209 @@
+---
+- name: Check we have a cluster name
+  assert:
+    that: cluster_name is defined
+    fail_msg: "FATAL: Must set cluster_name variable to point to a cluster structure."
+    success_msg: "OK: cluster_name is set."
+
+- name: Check we have some clusters
+  assert:
+    that: clusters is defined
+    fail_msg: "FATAL: Need a clusters data structure."
+    success_msg: "OK: clusters defined."
+
+- name: Check the cluster is an OpenShift one
+  assert:
+    that: clusters[cluster_name].is_openshift
+    fail_msg: "FATAL: {{ cluster_name }} is not an OpenShift cluster."
+    success_msg: "OK: cluster is an OpenShift one."
+
+- name: Check that cluster exists
+  assert:
+    that: clusters[cluster_name].nodes is defined
+    fail_msg: "FATAL: cluster_name must point to a cluster structure with some nodes."
+    success_msg: "OK: clusters[cluster_name] has nodes."
+
+# TODO: check that butane and coreos-install are there, if customizations are required.
+
+- name: Create the installation directory
+  become: no
+  file:
+    path: /home/lab/{{ cluster_name }}
+    owner: lab
+    group: lab
+    mode: 0755
+    state: directory
+
+- name: Create install-config.yaml
+  become: no
+  template:
+    src: templates/install-config.yaml.j2
+    dest: /home/lab/{{ cluster_name }}/install-config.yaml
+    owner: lab
+    group: lab
+    mode: 0644
+
+- name: Make a backup of install-config.yaml
+  become: no
+  copy:
+    src: /home/lab/{{ cluster_name }}/install-config.yaml
+    dest: /home/lab/install-config-{{ cluster_name }}.yaml
+    remote_src: yes
+    owner: lab
+    group: lab
+    mode: 0644
+
+# Only do this when there are customizations
+- name: Create installation manifests
+  become: no
+  shell: openshift-install create manifests
+  args:
+    chdir: /home/lab/{{ cluster_name }}
+  when: clusters[cluster_name].customizations
+
+# For MNO:
+- block:
+    - name: "MNO: Create ignition configs"
+      become: no
+      shell: openshift-install create ignition-configs
+      args:
+        chdir: /home/lab/{{ cluster_name }}
+
+    - name: "MNO: Make sure publish directory is in order"
+      file:
+        path: "{{ ignitions_directory }}/{{ cluster_name }}"
+        state: directory
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: "MNO: Publish ignition configs"
+      copy:
+        src: /home/lab/{{ cluster_name }}/{{ role }}.ign
+        dest: "{{ ignitions_directory }}/{{ cluster_name }}/{{ role }}.ign"
+        remote_src: yes
+        mode: 0644
+        owner: root
+        group: root
+      loop:
+        - bootstrap
+        - master
+        - worker
+      loop_control:
+        loop_var: role
+
+    - name: "MNO: Generate pxelinux.cfg files"
+      template:
+        src: templates/pxe-boot.j2
+        dest: /var/lib/tftpboot/pxelinux.cfg/{{ cluster_name }}-{{ role }}
+      loop:
+        - bootstrap
+        - master
+        - worker
+      loop_control:
+        loop_var: role
+
+    - name: "MNO: Set haproxy.cfg editing location"
+      set_fact:
+        marker: "DYNAMIC OTHER CLUSTER"
+
+    - block:
+        - name: "MNO: Set haproxy.cfg location for OCP4 cluster ONLY"
+          set_fact:
+            marker: "DYNAMIC OCP4 CLUSTER"
+
+        - name: "MNO: Hack at DNS zones for OCP4 cluster as well"
+          include_tasks: ws380-ocp4-cluster-hack.yml
+
+      when: cluster_name == "ocp4"
+
+    - name: "MNO: Remove any existing backend references from haproxy.cfg"
+      lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        search_string: "server {{ item[0].name }} {{ item[0].ip }}:{{ item[1] }}"
+        state: absent
+      with_nested:
+        - "{{ clusters[cluster_name].nodes }}"
+        - [ "80", "443" ]
+      loop_control:
+        label: "{{ item[0].name }}:{{ item[1] }}"
+      notify: reload_haproxy
+
+    # TODO: add frontend/backend definitions for new clusters if not yet there
+
+    - name: "MNO: Add insecure backend references to haproxy.cfg"
+      lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        insertbefore: "^# END {{ marker }} INSECURE HAPROXY CONFIG"
+        line: "    server {{ item.name }} {{ item.ip }}:80 check"
+        state: present
+      when: item.role == "master" or item.role == "worker"
+      loop: "{{ clusters[cluster_name].nodes }}"
+      loop_control:
+        label: "{{ item.name }}"
+      notify: reload_haproxy
+
+    - name: "MNO: Add secure backend references to haproxy.cfg"
+      lineinfile:
+        path: /etc/haproxy/haproxy.cfg
+        insertbefore: "^# END {{ marker }} SECURE HAPROXY CONFIG"
+        line: "    server {{ item.name }} {{ item.ip }}:443 check"
+        state: present
+      when: item.role == "master" or item.role == "worker"
+      loop: "{{ clusters[cluster_name].nodes }}"
+      loop_control:
+        label: "{{ item.name }}"
+      notify: reload_haproxy
+
+  when: clusters[cluster_name].n_control > 1
+
+# For SNO:
+- block:
+    - name: "SNO: Create the ignition file"
+      become: no
+      shell: openshift-install create single-node-ignition-config
+      args:
+        chdir: /home/lab/{{ cluster_name }}
+
+    - name: "SNO: Publish ignition config"
+      copy:
+        src: /home/lab/{{ cluster_name }}/bootstrap-in-place-for-live-iso.ign
+        dest: "{{ ignitions_directory }}/{{ cluster_name }}-{{ clusters[cluster_name].nodes[0].name }}.ign" # TODO: fix node name to be smarter
+        remote_src: yes
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: "SNO: Generate pxelinux.cfg file"
+      template:
+        src: templates/pxe-boot.j2
+        dest: /var/lib/tftpboot/pxelinux.cfg/{{ cluster_name }}-{{ clusters[cluster_name].nodes[0].name }} # TODO: fix node name to be smarter
+
+  when: clusters[cluster_name].n_control == 1
+
+# Back to normal flow for all
+
+- name: Create symbolic links to PXE boot entries
+  file:
+    path: /var/lib/tftpboot/pxelinux.cfg/{{ item.mac }}
+    src: "{{ item.cluster }}-{{ item.role }}"
+    state: link
+  when: (item.role != "none" and item.cluster != "none")
+  loop: "{{ clusters[cluster_name].nodes }}"
+  loop_control:
+    label: "{{ item.mac }} ({{ item.name }}) -> {{ item.cluster }}-{{ item.role }}"
+
+- name: Create a backup copy of cluster auth files
+  become: no
+  copy:
+    src: /home/lab/{{ cluster_name }}/auth/{{ item }}
+    dest: /home/lab/{{ item }}-{{ cluster_name }}
+    remote_src: yes
+    owner: lab
+    group: lab
+    mode: 0600
+  loop:
+    - kubeadmin-password
+    - kubeconfig
+
+...

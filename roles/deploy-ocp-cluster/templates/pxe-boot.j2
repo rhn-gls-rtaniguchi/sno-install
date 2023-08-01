@@ -1,0 +1,16 @@
+default menu.c32
+prompt 0
+timeout 86400
+menu title **** OpenShift {{ ocp_z }} Cluster "{{ cluster_name }}" PXE Menu ****
+
+{% if clusters[cluster_name].n_control > 1 %}
+label Install CoreOS {{ rhcos_ver }} for a {{ role }} node
+{% else %}
+label Install CoreOS {{ rhcos_ver }} for a {{ clusters[cluster_name].nodes[0].role }} node
+{% endif %}
+ kernel {{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64
+{% if clusters[cluster_name].n_control > 1 %}
+ append initrd={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img ip=dhcp rd.neednet=1 console=tty0 coreos.inst.install_dev=vda coreos.inst=yes coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img coreos.inst.ignition_url={{ ignitions_url }}/{{ cluster_name }}/{{ role }}.ign
+{% else %}
+ append initrd={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img ip=dhcp rd.neednet=1 console=tty0 coreos.inst.install_dev=vda coreos.inst=yes coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img coreos.inst.ignition_url={{ ignitions_url }}/{{ cluster_name }}-{{ clusters[cluster_name].nodes[0].name }}.ign
+{% endif %}

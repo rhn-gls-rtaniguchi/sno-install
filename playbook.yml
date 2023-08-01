@@ -11,6 +11,7 @@
       - syslinux
       - tftp-server
       - dhcp-server
+      - haproxy
       state: present
 
  

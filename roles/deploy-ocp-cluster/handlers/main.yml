@@ -1,0 +1,14 @@
+---
+- name: reload_named
+  service:
+    name: named
+    enabled: yes
+    state: reloaded
+
+- name: reload_haproxy
+  service:
+    name: haproxy
+    enabled: yes
+    state: reloaded
+
+...

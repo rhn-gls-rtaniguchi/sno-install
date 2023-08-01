@@ -1,0 +1,7 @@
+---
+boot_host: http://192.168.50.254:8080
+
+ignitions_directory: /var/www/html/openshift4/ignitions/
+ignitions_url: "{{ boot_host }}/openshift4/ignitions"
+images_url: "{{ boot_host }}/openshift4/images"
+...

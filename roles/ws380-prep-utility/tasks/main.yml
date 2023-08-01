@@ -1,0 +1,62 @@
+---
+# Publish pull secret
+- name: Put the pull-secret onto utility VM
+  become: no
+  ansible.builtin.copy:
+    src: files/pull-secret
+    dest: /home/lab/pull-secret
+    owner: lab
+    group: lab
+    mode: 0600
+
+# Extract the binaries
+- name: Extract "oc"
+  ansible.builtin.unarchive:
+    src: "{{ binaries_directory }}/{{ tools.oc.bin }}"
+    dest: /usr/local/bin/
+    exclude:
+      - README.md
+      - kubectl
+    remote_src: yes
+
+- name: Extract "openshift-install"
+  ansible.builtin.unarchive:
+    src: "{{ binaries_directory }}/{{ tools.openshift_install.bin }}"
+    dest: /usr/local/bin/
+    exclude:
+      - README.md
+    remote_src: yes
+
+# Deploy butane
+- name: Copy butane into its place
+  ansible.builtin.copy:
+    src: "{{ binaries_directory }}/{{ tools.butane.bin }}"
+    dest: /usr/local/bin/butane
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0755
+
+# Deploy coreos-installer
+- name: Copy coreos-installer into its place
+  ansible.builtin.copy:
+    src: "{{ binaries_directory }}/{{ tools.rhcos_inst.bin }}"
+    dest: /usr/local/bin/coreos-installer
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0755
+
+# Bash completion for finale
+- name: Create completion files
+  ansible.builtin.command:
+    argv:
+      - /bin/bash
+      - -c
+      - "{{ item }} completion bash > /etc/bash_completion.d/{{ item }}.completion"
+  args:
+    creates: /etc/bash_completion.d/{{ item }}
+  loop:
+    - oc
+    - openshift-install
+...

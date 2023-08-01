@@ -1,0 +1,8 @@
+---
+- name: reload_named
+  service:
+    name: named
+    enabled: yes
+    state: reloaded
+
+...

@@ -29,10 +29,11 @@
     url: "{{ rhcos_iso_url }}"
     dest: "{{ images_directory }}"
 
+
 - name: Create symlink RHCOS ISO
   ansible.builtin.file:
     src: "{{ images_directory }}/{{ rhcos_iso_filename }}"
-    dest: "/var/lib/tftpboot/images/"
+    dest: "/var/lib/tftpboot/images/{{ rhcos_iso_filename }}"
     state: link
 
 
@@ -45,7 +46,7 @@
 - name: Create symlink RHCOS rootfs
   ansible.builtin.file:
     src: "{{ images_directory }}/{{ rhcos_rootfs_filename }}"
-    dest: "/var/lib/tftpboot/images/"
+    dest: "/var/lib/tftpboot/images/{{ rhcos_rootfs_filename }}"
     state: link
 
 
@@ -57,7 +58,7 @@
 - name: Create symlink RHCOS kernel
   ansible.builtin.file:
     src: "{{ images_directory }}/{{ rhcos_kernel_filename }}"
-    dest: "/var/lib/tftpboot/images/"
+    dest: "/var/lib/tftpboot/images//{{ rhcos_kernel_filename }}"
     state: link
 
 
@@ -69,8 +70,8 @@
 
 - name: Create symlink RHCOS initramfs
   ansible.builtin.file:
-    src: "{{ images_directory }}/{{ rhcos_iso_filename }}"
-    dest: "/var/lib/tftpboot/images/"
+    src: "{{ images_directory }}/{{ rhcos_initramfs_filename }}"
+    dest: "/var/lib/tftpboot/images/{{ rhcos_initramfs_filename }}"
     state: link
     
 - name: Create temp directory to store ISO

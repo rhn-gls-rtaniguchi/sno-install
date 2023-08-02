@@ -2,6 +2,7 @@
 - name: Creating a PXE boot server
   hosts: default
   become: true
+  gather_facts: false
   tasks:
   - name: Install tools
     ansible.builtin.yum:
@@ -45,9 +46,17 @@
   - name: Install tools
     ansible.builtin.yum:
       name: syslinux-tftpboot
-      installroot: /tmp/fedora
       download_only: true
-      
+      download_dir:  /tmp/fedora
+    register: tftpboot      
+ 
+
+  - name: Convert tftpboot file to cpio
+      Comment
+    ansible.builtin.shell:
+      chdir: /tmp/fedora
+      cmd: "rpm2cpio {{ tftpboot.results[0] | regex_search('syslinux-tftpboot-[\\w\\-\\.]+') }}.rpm | cpio -idmv"
+    
   - name: Copy pxelinux.0 file to the local tftp-server
     ansible.builtin.copy:
       src: "{{ item }}"

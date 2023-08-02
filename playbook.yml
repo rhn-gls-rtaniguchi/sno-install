@@ -8,81 +8,30 @@
       name:
       - bind
       - httpd
-      - syslinux
       - tftp-server
       - dhcp-server
+      - python3-netaddr
+      - p7zip
       state: present
+
   - name: Change HTTPD configuration
     # Comment
     ansible.builtin.lineinfile:
       regexp: "^Listen 80"
       line: "Listen 8080"
       path: /etc/httpd/conf/httpd.conf
-      
-  - name: Create directory to store bootloader files
-    vars:
-      files_bios: 
-        - pxelinux.0
-        - menu.c32
-        - vesamenu.c32
-        - ldlinux.c32 
-        - libcom32.c32 
-        - libutil.c32
-    ansible.builtin.copy:
-      dest: /var/lib/tftpboot/
-      src: "/usr/share/syslinux/{{ item }}"
-      remote_src: true
-    loop: "{{ files_bios }}"
-
-
-  - name: Download UEFI bootloader images
-    ansible.builtin.yum:
-      name:
-      - shim-x64
-      - grub2-efi-x64
-      installroot: /tmp/fedora
 
   - name: Create directory to store bootloaders
     ansible.builtin.file:
-      path: /var/lib/tftpboot/uefi
+      path: /var/lib/tftpboot/
       state: directory
-
-  - name: Copy UEFI bootloaders
-    vars:
-      files_uefi: 
-        - shimx64.efi
-        - grubx64.efi
-    ansible.builtin.copy:
-      src: /tmp/fedora/boot/efi/EFI/fedora/{{ item }}
-      dest: /var/lib/tftpboot/uefi
-      remote_src: true
-    loop: "{{files_uefi}}"
-
-  - name: Copy UEFI bootloaders
-    ansible.builtin.copy:
-      src: /tmp/fedora/boot/efi/EFI/BOOT/BOOTX64.EFI
-      dest: /var/lib/tftpboot/uefi
-      remote_src: true
-
-  - name: Create directory to store bootloaders
-    ansible.builtin.file:
-      path: /var/lib/tftpboot/pxelinux.cfg
-      state: directory
-
-  - name: Download UEFI bootloader images
-    ansible.builtin.yum:
-      name:
-      - shim-x64
-      - grub2-efi-x64
-      installroot: /tmp/fedora
-
 
   - name: Create directory to host images
     ansible.builtin.file:
       group: apache
       mode: "0755"
       owner: apache
-      path: /var/www/html/openshift4
+      path: /var/www/html/openshift4/images
       state: directory
 
   - name: Create directory to host ignition files
@@ -93,6 +42,20 @@
       path: /var/www/html/openshift4/ignitions
       state: directory
 
+  - name: Install tools
+    ansible.builtin.yum:
+      name: syslinux-tftpboot
+      installroot: /tmp/fedora
+      download_only: true
+      
+  - name: Copy pxelinux.0 file to the local tftp-server
+    ansible.builtin.copy:
+      src: "{{ item }}"
+      dest: /var/lib/tftpboot/
+      remote_src: true
+    loop:
+      - /tmp/fedora/tftpboot/pxelinux.0
+      - /tmp/fedora/tftpboot/menu.c32
 
   - name: Configure new interface
     # Comment

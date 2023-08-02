@@ -9,11 +9,6 @@ $TTL  1D
 		IN NS dns.ocp4.example.com.
 
 ; BEGIN STATIC 50 rZONE RECORDS
-254	IN PTR api.ocp4.example.com.
-9	IN PTR bootstrap.ocp4.example.com. 
-10	IN PTR master01.ocp4.example.com. 
-11	IN PTR master02.ocp4.example.com. 
-12	IN PTR master03.ocp4.example.com. 
 ; END STATIC 50 rZONE RECORDS
 
 ; BEGIN DYNAMIC 50 rZONE RECORDS

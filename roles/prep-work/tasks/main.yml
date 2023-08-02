@@ -19,6 +19,11 @@
     src: "{{ node.cluster }}-{{ node.name }}"
     state: link
 
+- name: Deploy PXE UEFI config file
+  template:
+    src: templates/efi-sno.j2
+    dest: "/var/lib/tftpboot/pxelinux.cfg/{{ node.ip | ansible.utils.ip4_hex }}"
+
 # Create the OCP installation directory and populate it
 - name: Make sure workdir exists
   become: no

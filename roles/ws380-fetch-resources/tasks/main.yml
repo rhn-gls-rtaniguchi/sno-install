@@ -10,6 +10,8 @@
   loop:
     - "{{ binaries_directory }}"
     - "{{ images_directory }}"
+    - "/var/lib/tftpboot/pxelinux.cfg/"
+    - "/var/lib/tftpboot/images/"
 
 # Downloads often fail ("handshake timed out" blabla) so do them first.
 - name: Download tools
@@ -27,18 +29,89 @@
     url: "{{ rhcos_iso_url }}"
     dest: "{{ images_directory }}"
 
+- name: Create symlink RHCOS ISO
+  ansible.builtin.file:
+    src: "{{ images_directory }}/{{ rhcos_iso_filename }}"
+    dest: "/var/lib/tftpboot/images/"
+    state: link
+
+
+
 - name: Download RHCOS rootfs
   get_url:
     url: "{{ rhcos_rootfs_url }}"
     dest: "{{ images_directory }}"
+
+- name: Create symlink RHCOS rootfs
+  ansible.builtin.file:
+    src: "{{ images_directory }}/{{ rhcos_rootfs_filename }}"
+    dest: "/var/lib/tftpboot/images/"
+    state: link
+
 
 - name: Download RHCOS kernel
   get_url:
     url: "{{ rhcos_kernel_url }}"
     dest: "{{ images_directory }}"
 
+- name: Create symlink RHCOS kernel
+  ansible.builtin.file:
+    src: "{{ images_directory }}/{{ rhcos_kernel_filename }}"
+    dest: "/var/lib/tftpboot/images/"
+    state: link
+
+
+
 - name: Download RHCOS initramfs
   get_url:
     url: "{{ rhcos_initramfs_url }}"
     dest: "{{ images_directory }}"
+
+- name: Create symlink RHCOS initramfs
+  ansible.builtin.file:
+    src: "{{ images_directory }}/{{ rhcos_iso_filename }}"
+    dest: "/var/lib/tftpboot/images/"
+    state: link
+    
+- name: Create temp directory to store ISO
+  ansible.builtin.file:
+    state: directory
+    dest: /tmp/iso
+
+- name: Create temp directory to store ISO
+  ansible.builtin.file:
+    state: directory
+    dest: /tmp/image
+
+- name: Extract img file from a LiveCD
+  community.general.iso_extract:
+    image: "{{ images_directory }}/{{ rhcos_iso_filename }}"
+    dest: /tmp/iso
+    files:
+    - images/efiboot.img
+    - isolinux/ldlinux.c32
+    - isolinux/libcom32.c32
+    - isolinux/libutil.c32
+    - isolinux/vesamenu.c32
+
+- name: Extract EFI files
+  community.general.iso_extract:
+    image: "/tmp/iso/efiboot.img"
+    dest: /tmp/
+    files: 
+    - EFI/redhat/shimx64.efi
+    - EFI/redhat/grubx64.efi
+
+- name: Copy EFI files to the TFTP server directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /var/lib/tftpboot/
+    remote_src: true
+  loop: 
+    - /tmp/shimx64.efi
+    - /tmp/grubx64.efi
+    - /tmp/iso/ldlinux.c32
+    - /tmp/iso/libcom32.c32
+    - /tmp/iso/libutil.c32
+    - /tmp/iso/vesamenu.c32
 ...

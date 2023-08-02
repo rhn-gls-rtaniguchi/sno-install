@@ -47,6 +47,7 @@
     group: root
     mode: 0755
 
+
 # Bash completion for finale
 - name: Create completion files
   ansible.builtin.command:
@@ -59,4 +60,7 @@
   loop:
     - oc
     - openshift-install
+
+  
+
 ...

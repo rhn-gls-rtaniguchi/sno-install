@@ -25,9 +25,10 @@
     dest: /var/lib/tftpboot/efi-sno
 
 - name: Create symbolic link to EFI boot entry
-  template:
+  file:
     path: /var/lib/tftpboot/grub.cfg
-    src: "efi-sno.j2"
+    src: "/var/lib/tftpboot/efi-sno"
+    state: link
 
 # Create the OCP installation directory and populate it
 - name: Make sure workdir exists

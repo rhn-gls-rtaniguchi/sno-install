@@ -65,7 +65,7 @@
 
 - name: Backup stale grub.cfg from default config
   copy:
-    path: /var/lib/tftpboot/grub.cfg-foundation
+    src: /var/lib/tftpboot/grub.cfg-foundation
     dest: /var/lib/tftpboot/grub.cfg-f0.bkp
     remote_src: true
 

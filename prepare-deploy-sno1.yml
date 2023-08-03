@@ -6,7 +6,7 @@
   vars:
     node: 
       name: node
-      ip: 192.168.50.18
+      ip: 172.25.254.1
       mac: "01-54-e1-ad-f2-84-3b"
       network_adapter: enp2s0
       role: SNO

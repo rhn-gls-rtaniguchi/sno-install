@@ -19,70 +19,75 @@
     src: "{{ node.cluster }}-{{ node.name }}"
     state: link
 
-- name: Deploy PXE UEFI config file
+- name: Deploy EFI config file
   template:
     src: templates/efi-sno.j2
-    dest: "/var/lib/tftpboot/pxelinux.cfg/{{ node.ip | ansible.utils.ip4_hex }}"
+    dest: /var/lib/tftpboot/efi-sno
+
+- name: Create symbolic link to EFI boot entry
+  template:
+    path: /var/lib/tftpboot/grub.cfg
+    src: "efi-sno.j2"
 
 # Create the OCP installation directory and populate it
 - name: Make sure workdir exists
   become: no
   file:
-    path: /home/vagrant/{{ node.cluster }}
+    path: /home/kiosk/{{ node.cluster }}
     state: directory
     mode: 0755
-    owner: vagrant
-    group: vagrant
+    owner: kiosk
+    group: kiosk
 
 - name: Place the install config to workdir
   become: no
   template:
     src: templates/install-config-sno.yaml.j2
-    dest: /home/vagrant/{{ node.cluster }}/install-config.yaml
+    dest: /home/kiosk/{{ node.cluster }}/install-config.yaml
     mode: 0644
-    owner: vagrant
-    group: vagrant
+    owner: kiosk
+    group: kiosk
 
 - name: Create a backup copy of install config
   become: no
   copy:
-    src: /home/vagrant/{{ node.cluster }}/install-config.yaml
-    dest: /home/vagrant/install-config-{{ node.cluster }}.yaml
+    src: /home/kiosk/{{ node.cluster }}/install-config.yaml
+    dest: /home/kiosk/install-config-{{ node.cluster }}.yaml
     remote_src: yes
     mode: 0644
-    owner: vagrant
-    group: vagrant
+    owner: kiosk
+    group: kiosk
 
 - name: Create installation manifests
   become: no
   shell: openshift-install create manifests
   args:
-    chdir: /home/vagrant/{{ node.cluster }}
+    chdir: /home/kiosk/{{ node.cluster }}
 
 - name: Deploy the network config customization
   become: no
   template:
     src: templates/netcfg.bu.j2
-    dest: /home/vagrant/netcfg.bu
+    dest: /home/kiosk/netcfg.bu
     mode: 0644
-    owner: vagrant
-    group: vagrant
+    owner: kiosk
+    group: kiosk
 
 - name: Process network config with butane
   become: no
   shell: butane netcfg.bu -o {{ node.cluster }}/openshift/01-master-network.yaml
   args:
-    chdir: /home/vagrant
+    chdir: /home/kiosk
 
 - name: Create the ignition file
   become: no
   shell: openshift-install create single-node-ignition-config
   args:
-    chdir: /home/vagrant/{{ node.cluster }}
+    chdir: /home/kiosk/{{ node.cluster }}
 
 - name: Publish ignition configs
   copy:
-    src: /home/vagrant/{{ node.cluster }}/bootstrap-in-place-for-live-iso.ign
+    src: /home/kiosk/{{ node.cluster }}/bootstrap-in-place-for-live-iso.ign
     dest: "{{ ignitions_directory }}/{{ node.cluster }}-{{ node.name }}.ign"
     remote_src: yes
     mode: 0644
@@ -93,11 +98,11 @@
 - name: Create a backup copy of cluster auth files
   become: no
   copy:
-    src: /home/vagrant/{{ node.cluster }}/auth/{{ item }}
-    dest: /home/vagrant/{{ item }}-{{ node.cluster }}
+    src: /home/kiosk/{{ node.cluster }}/auth/{{ item }}
+    dest: /home/kiosk/{{ item }}-{{ node.cluster }}
     remote_src: yes
-    owner: vagrant
-    group: vagrant
+    owner: kiosk
+    group: kiosk
     mode: 0644
   loop:
     - kubeadmin-password

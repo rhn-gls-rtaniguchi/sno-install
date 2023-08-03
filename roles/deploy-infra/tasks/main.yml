@@ -62,10 +62,9 @@
     - reload_named
 
 - name: Make sure DHCP server recognizes us
-  lineinfile:
+  blockinfile:
     path: /etc/dhcp/dhcpd.conf
     insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
-    regexp: "(?i)hardware ethernet {{ node.mac | regex_replace('^01-', '') | regex_replace('-', ':') }}"
     block: |
       host {{ node.name }}-{{ node.cluster }} { 
             hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; 

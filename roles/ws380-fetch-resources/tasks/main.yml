@@ -10,8 +10,8 @@
   loop:
     - "{{ binaries_directory }}"
     - "{{ images_directory }}"
+    - "{{ ignitions_directory }}"
     - "/var/lib/tftpboot/pxelinux.cfg/"
-    - "/var/lib/tftpboot/images/"
 
 # Downloads often fail ("handshake timed out" blabla) so do them first.
 - name: Download tools

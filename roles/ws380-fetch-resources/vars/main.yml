@@ -28,4 +28,6 @@ rhcos_initramfs_url: "{{ openshift_mirror }}/dependencies/rhcos/{{ ocp_maj }}/{{
 
 binaries_directory: /content/binaries/
 images_directory: /content/coreos/x86_64/
+ignitions_directory: /content/ignitions/
+
 ...

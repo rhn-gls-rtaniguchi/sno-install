@@ -58,12 +58,12 @@
 #   notify:
 #     - reload_named
 
-# - name: Make sure DHCP server recognizes us
-#   lineinfile:
-#     path: /etc/dhcp/dhcpd.conf
-#     insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
-#     regexp: "(?i)hardware ethernet {{ node.mac | regex_replace('^01-', '') | regex_replace('-', ':') }}"
-#     line: 'host {{ node.name }}-{{ node.cluster }} { hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; fixed-address {{ node.ip }}; option host-name "{{ node.name }}.{{ node.cluster }}.example.com"; option domain-name "{{ node.cluster }}.example.com"; option domain-search "{{ node.cluster }}.example.com"; }'
-#     state: present
-#   notify: restart_dhcpd
+- name: Make sure DHCP server recognizes us
+  lineinfile:
+    path: /etc/dhcp/dhcpd.conf
+    insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
+    regexp: "(?i)hardware ethernet {{ node.mac | regex_replace('^01-', '') | regex_replace('-', ':') }}"
+    line: 'host {{ node.name }}-{{ node.cluster }} { hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; fixed-address {{ node.ip }}; option host-name "{{ node.name }}.{{ node.cluster }}.example.com"; option domain-name "{{ node.cluster }}.example.com"; option domain-search "{{ node.cluster }}.example.com"; }'
+    state: present
+  notify: restart_dhcpd
 ...

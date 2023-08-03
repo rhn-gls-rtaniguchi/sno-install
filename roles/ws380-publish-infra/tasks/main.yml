@@ -19,6 +19,15 @@
     - reload_named
 
 
+- name: Publish base forward and reverse zones
+  copy:
+    src: files/254.25.172.in-addr.arpa.zone
+    dest: /var/named/254.25.172.in-addr.arpa.zone
+    mode: 0640
+    owner: root
+    group: named
+  
+
 # chronyd fixes
 - name: Make sure chronyd is allowing time sync
   lineinfile:

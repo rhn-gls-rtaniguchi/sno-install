@@ -7,7 +7,7 @@
     node: 
       name: node
       ip: 172.25.254.1
-      mac: "01-54-e1-ad-f2-84-3b"
+      mac: "00-e0-4c-98-00-02"
       network_adapter: enp2s0
       role: SNO
       cluster: sno1

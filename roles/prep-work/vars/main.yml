@@ -3,7 +3,7 @@ ignitions_directory: /content/ignitions/
 
 boot_host: http://172.25.254.250/
 
-ignitions_url: "{{ boot_host }}{{ ignitions_directory }}"
-binaries_url: "{{ boot_host }}/content/binaries"
-images_url: "{{ boot_host }}/content/coreos/x86_64/"
+ignitions_url: "{{ boot_host }}/ignitions"
+binaries_url: "{{ boot_host }}/binaries"
+images_url: "{{ boot_host }}/coreos/x86_64/"
 ...

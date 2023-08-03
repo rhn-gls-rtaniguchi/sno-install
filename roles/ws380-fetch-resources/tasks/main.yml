@@ -24,40 +24,27 @@
     - butane
     - rhcos_inst
 
-# - name: Download RHCOS live ISO
-#   get_url:
-#     url: "{{ rhcos_iso_url }}"
-#     dest: "{{ images_directory }}"
-
-
-# - name: Create symlink RHCOS ISO
-#   ansible.builtin.file:
-#     src: "{{ images_directory }}/{{ rhcos_iso_filename }}"
-#     dest: "/var/lib/tftpboot/{{ rhcos_iso_filename }}"
-#     state: link
-
 - name: Download RHCOS rootfs
   get_url:
     url: "{{ rhcos_rootfs_url }}"
     dest: "{{ images_directory }}"
 
 - name: Create symlink RHCOS rootfs
-  ansible.builtin.file:
+  ansible.builtin.copy:
     src: "{{ images_directory }}/{{ rhcos_rootfs_filename }}"
     dest: "/var/lib/tftpboot/rhcos-rootfs.img"
-    state: link
-
+    remote_src: true
 
 - name: Download RHCOS kernel
   get_url:
     url: "{{ rhcos_kernel_url }}"
     dest: "{{ images_directory }}"
 
-- name: Create symlink RHCOS kernel
-  ansible.builtin.file:
+- name: Create copy of RHCOS kernel to PXE Boot
+  ansible.builtin.copy:
     src: "{{ images_directory }}/{{ rhcos_kernel_filename }}"
     dest: "/var/lib/tftpboot/rhcos-vmlinuz"
-    state: link
+    remote_src: true
 
 
 
@@ -67,9 +54,9 @@
     dest: "{{ images_directory }}"
 
 - name: Create symlink RHCOS initramfs
-  ansible.builtin.file:
+  ansible.builtin.copy:
     src: "{{ images_directory }}/{{ rhcos_initramfs_filename }}"
     dest: "/var/lib/tftpboot/rhcos-initrd.img"
-    state: link
+    remote_src: true
     
 ...

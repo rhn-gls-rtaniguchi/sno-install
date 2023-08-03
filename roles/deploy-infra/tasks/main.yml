@@ -34,7 +34,7 @@
     - reload_named
 
 - name: Update reverse DNS zone
-  blockinfile:
+  lineinfile:
     path: /var/named/254.25.172.in-addr.arpa.zone
     insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
     line: "{{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."

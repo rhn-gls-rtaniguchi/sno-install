@@ -64,7 +64,7 @@
     - restart_dhcpd
 
 - name: Backup stale grub.cfg from default config
-  file:
+  copy:
     path: /var/lib/tftpboot/grub.cfg-foundation
     dest: /var/lib/tftpboot/grub.cfg-f0.bkp
     remote_src: true

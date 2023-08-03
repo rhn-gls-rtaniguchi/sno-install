@@ -1,6 +1,6 @@
 ---
 - name: Prepare the utility VM for deployment of SNO1 cluster
-  hosts: default
+  hosts: localhost
   become: true
   gather_facts: false
   vars:

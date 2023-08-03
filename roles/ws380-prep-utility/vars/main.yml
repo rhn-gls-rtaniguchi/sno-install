@@ -1,6 +1,6 @@
 ---
-binaries_directory: /var/www/html/openshift4/binaries/
-images_directory: /var/www/html/openshift4/images/
+binaries_directory: /content/binaries/
+images_directory: /content/coreos/x86_64/
 
 tools:
   oc:

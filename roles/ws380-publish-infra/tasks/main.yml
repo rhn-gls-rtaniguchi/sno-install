@@ -63,18 +63,18 @@
   notify:
     - restart_dhcpd
 
-# - name: Backup stale grub.cfg from default config
-#   copy:
-#     src: /var/lib/tftpboot/grub.cfg-foundation
-#     dest: /var/lib/tftpboot/grub.cfg-f0.bkp
-#     remote_src: true
+- name: Backup stale grub.cfg from default config
+  copy:
+    src: /var/lib/tftpboot/grub.cfg-foundation
+    dest: /var/lib/tftpboot/grub.cfg-f0.bkp
+    remote_src: true
 
-# - name: Publish base grub.cfg
-#   copy:
-#     src: files/grub.cfg-foundation
-#     dest: /var/lib/tftpboot/grub.cfg-foundation
-#     mode: 0644
-#     owner: root
+- name: Publish base grub.cfg
+  copy:
+    src: files/grub.cfg-foundation
+    dest: /var/lib/tftpboot/grub.cfg-foundation
+    mode: 0644
+    owner: root
 
 
 

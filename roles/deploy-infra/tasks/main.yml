@@ -23,13 +23,12 @@
   blockinfile:
     path: /etc/named.conf
     insertafter: "^# BEGIN ANSIBLE MANAGED DNS ZONES$"
-    regexp: '^zone "{{ node.cluster }}.example.com"'
     state: present
     block: |
       zone "{{ node.cluster }}.example.com" { 
-      type master; 
-      file "{{ node.cluster }}.example.com.zone"; 
-      allow-update { none; }; 
+            type master; 
+            file "{{ node.cluster }}.example.com.zone"; 
+            allow-update { none; }; 
       };
   notify:
     - reload_named
@@ -38,7 +37,6 @@
   blockinfile:
     path: /var/named/254.25.172.in-addr.arpa.zone
     insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
-    regexp: "^{{ node.ip | regex_replace('^172.25.254.', '') }}"
     line: "{{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."
     state: present
   register: zoneupdate

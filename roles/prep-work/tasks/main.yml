@@ -8,27 +8,27 @@
 #  - variable "node" according to vms structure
 #
 # Publish PXE config stuff
-- name: Deploy PXE config file
-  template:
-    src: templates/pxe-sno.j2
-    dest: /var/lib/tftpboot/pxelinux.cfg/{{ node.cluster }}-{{ node.name }}
+# - name: Deploy PXE config file
+#   template:
+#     src: templates/pxe-sno.j2
+#     dest: /var/lib/tftpboot/pxelinux.cfg/{{ node.cluster }}-{{ node.name }}
 
-- name: Create symbolic link to PXE boot entry
-  file:
-    path: /var/lib/tftpboot/pxelinux.cfg/{{ node.mac }}
-    src: "{{ node.cluster }}-{{ node.name }}"
-    state: link
+# - name: Create symbolic link to PXE boot entry
+#   file:
+#     path: /var/lib/tftpboot/pxelinux.cfg/{{ node.mac }}
+#     src: "{{ node.cluster }}-{{ node.name }}"
+#     state: link
 
-- name: Deploy EFI config file
-  template:
-    src: templates/efi-sno.j2
-    dest: /var/lib/tftpboot/efi-sno
+# - name: Deploy EFI config file
+#   template:
+#     src: templates/efi-sno.j2
+#     dest: /var/lib/tftpboot/efi-sno
 
-- name: Create symbolic link to EFI boot entry
-  file:
-    path: /var/lib/tftpboot/grub.cfg
-    src: "/var/lib/tftpboot/efi-sno"
-    state: link
+# - name: Create symbolic link to EFI boot entry
+#   file:
+#     path: /var/lib/tftpboot/grub.cfg
+#     src: "/var/lib/tftpboot/efi-sno"
+#     state: link
 
 # Create the OCP installation directory and populate it
 - name: Make sure workdir exists

@@ -79,24 +79,24 @@
 
 
 # pxe boot config
-- name: Publish default PXE configuration file
-  copy:
-    src: files/default-pxe-config
-    dest: /var/lib/tftpboot/pxelinux.cfg/ocp4-default-pxe
-    mode: 0644
-    owner: root
-    group: root
+# - name: Publish default PXE configuration file
+#   copy:
+#     src: files/default-pxe-config
+#     dest: /var/lib/tftpboot/pxelinux.cfg/ocp4-default-pxe
+#     mode: 0644
+#     owner: root
+#     group: root
 
-- name: Update symlink to the new PXE configuration file
-  file:
-    path: /var/lib/tftpboot/pxelinux.cfg/default
-    src: /var/lib/tftpboot/pxelinux.cfg/ocp4-default-pxe
-    state: link
+# - name: Update symlink to the new PXE configuration file
+#   file:
+#     path: /var/lib/tftpboot/pxelinux.cfg/default
+#     src: /var/lib/tftpboot/pxelinux.cfg/ocp4-default-pxe
+#     state: link
 
-- name: Make sure tftp.socket is enabled
-  service:
-    name: tftp.socket
-    enabled: yes
+# - name: Make sure tftp.socket is enabled
+#   service:
+#     name: tftp.socket
+#     enabled: yes
 
 
 

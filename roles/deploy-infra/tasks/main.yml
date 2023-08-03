@@ -20,7 +20,7 @@
     - reload_named
 
 - name: Configure DNS to load the published zone
-  lineinblock:
+  blockinfile:
     path: /etc/named.conf
     insertafter: "^# BEGIN ANSIBLE MANAGED DNS ZONES$"
     regexp: '^zone "{{ node.cluster }}.example.com"'
@@ -35,7 +35,7 @@
     - reload_named
 
 - name: Update reverse DNS zone
-  lineinblock:
+  blockinfile:
     path: /var/named/254.25.172.in-addr.arpa.zone
     insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
     regexp: "^{{ node.ip | regex_replace('^172.25.254.', '') }}"

@@ -27,7 +27,7 @@
 
 # Cleanup - /var/lib/tftpboot/pxelinux.cfg (files only)
 # Cleanup - /var/www/html/openshift4/ignitions/ocp4 (files only - stale data!)
-# - name: Get a list of pxelinux.cfg/ and ignitions/ contents
+- name: Get a list of pxelinux.cfg/ and ignitions/ contents
   ansible.builtin.find:
     paths:
       - /content/ignitions

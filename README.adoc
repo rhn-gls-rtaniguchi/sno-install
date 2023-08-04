@@ -1,0 +1,22 @@
+= Creating an environment to run Single Node OpenShift from a foundation 0 Machine
+
+I am using an instructor RHCIfoundation 9.x environment. 
+As I am using foundation0 as my base machine to deliver classes, I think it would be more user-friendly to start from this point. I deployed a DO180 environment, but any course that does not require any VM is fine.
+
+== What you need to have
+
+Two computers
+
+.. One will be the foundation0 machine
+.. Another will be the SNO machine
+
+=== What are the requirements for each computer?
+
+
+
+. One computer with the RHCIfoundation deployed and with two network adapters: one that provides internet connection enabled with the rht-external --configure command and another that will provide PXE boot access.
+. Make sure the machine has at least two network adapters (it can be a wifi adapter and your NIC to connect to an external machine)
+. Identify what network adapter is connected to the internet to enable access from that adapter.
+. The other adapter will be used to PXE boot the secondary computer that will host Single Node OpenShift
+
+. One computer with at least 16Gb RAM and two hard drives (one that you will install SNO and another to provide a storage). This machine will connnect to the network adapter with a wired network. No need to provide a secondary adapter (unless you want to use an internet connection externally)

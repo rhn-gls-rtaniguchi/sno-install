@@ -21,9 +21,9 @@ images:
     download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64"
     dest: "{{ tftpboot_directory }}/rhcos-vmlinuz"
   initramfs: 
-    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs-x86_64.img"
+    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img"
     dest: "{{ tftpboot_directory }}/rhcos-initrd.img"
   rootfs: 
-    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs-x86_64.img"
+    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img"
     dest: "{{ tftpboot_directory }}/rhcos-rootfs.img"    
 ...

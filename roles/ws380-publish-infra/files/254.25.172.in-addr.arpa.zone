@@ -9,7 +9,7 @@ $TTL 86400
 
 ; owner                 TTL     CL  type        RDATA
 @                               IN  NS          foundation0.ilt.example.com.
-$GENERATE       1-200   $       PTR     foundation$.ilt.example.com.
+; $GENERATE       1-200   $       PTR     foundation$.ilt.example.com.
 250                             IN  PTR         foundation0.ilt.example.com.
 252                             IN  PTR         jegui.ilt.example.com.
 254                             IN  PTR         classroom.example.com.

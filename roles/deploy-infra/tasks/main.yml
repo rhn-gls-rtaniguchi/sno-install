@@ -33,6 +33,7 @@
       initrdefi rhcos-initrd.img 
       } 
 
+
 - name: Publish forward DNS zone
   template:
     src: templates/sno.zone.j2

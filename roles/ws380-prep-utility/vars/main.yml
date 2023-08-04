@@ -1,6 +1,7 @@
 ---
 binaries_directory: /content/binaries/
 images_directory: /content/coreos/x86_64/
+tftpboot_directory: /var/lib/tftpboot
 
 tools:
   oc:
@@ -14,4 +15,15 @@ tools:
 
   rhcos_inst:
     bin: "coreos-installer-{{ cinst_ver }}-linux-x86_64"
+
+images:
+  kernel: 
+    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64"
+    dest: "{{ tftpboot_directory }}/rhcos-vmlinuz"
+  initramfs: 
+    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs-x86_64.img"
+    dest: "{{ tftpboot_directory }}/rhcos-initrd.img"
+  rootfs: 
+    download: "{{ images_directory }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs-x86_64.img"
+    dest: "{{ tftpboot_directory }}/rhcos-rootfs.img"    
 ...

@@ -29,34 +29,15 @@
     url: "{{ rhcos_rootfs_url }}"
     dest: "{{ images_directory }}"
 
-- name: Create copy RHCOS rootfs to PXE Boot
-  ansible.builtin.copy:
-    src: "{{ images_directory }}/{{ rhcos_rootfs_filename }}"
-    dest: "/var/lib/tftpboot/rhcos-rootfs.img"
-    remote_src: true
-
 - name: Download RHCOS kernel
   get_url:
     url: "{{ rhcos_kernel_url }}"
     dest: "{{ images_directory }}"
-
-- name: Create copy of RHCOS kernel to PXE Boot
-  ansible.builtin.copy:
-    src: "{{ images_directory }}/{{ rhcos_kernel_filename }}"
-    dest: "/var/lib/tftpboot/rhcos-vmlinuz"
-    remote_src: true
-
-
 
 - name: Download RHCOS initramfs
   get_url:
     url: "{{ rhcos_initramfs_url }}"
     dest: "{{ images_directory }}"
 
-- name: Create copy RHCOS initramfs to PXE Boot
-  ansible.builtin.copy:
-    src: "{{ images_directory }}/{{ rhcos_initramfs_filename }}"
-    dest: "/var/lib/tftpboot/rhcos-initrd.img"
-    remote_src: true
     
 ...

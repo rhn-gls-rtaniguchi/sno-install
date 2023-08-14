@@ -6,11 +6,16 @@
   vars:
     node: 
       name: node
-      ip: 172.25.254.205
-      mac: "00-e0-4c-98-00-02"
-      network_adapter: enp2s0
+      ip: 172.25.254.225
+        # adjust the MAC Address:        
+      mac: "c8-d3-ff-a5-40-96"
+        # Adjust the network adapter name
+      network_adapter: eno1
       role: SNO
       cluster: sno1
+# adjust your disk accordingly
+      bootstrap_disk: /dev/nvme0n1
+      inst_disk: /dev/sda
       online: yes
   pre_tasks:
     - name: Put the pull-secret onto kiosk VM

@@ -1,4 +1,4 @@
-apiVersion: v1beta4
+apiVersion: v1
 baseDomain: example.com
 metadata:
   name: {{ node.cluster }}
@@ -13,7 +13,7 @@ controlPlane:
 platform:
   none: {}
 BootstrapInPlace:
-  InstallationDisk: /dev/sda
+  InstallationDisk: {{ node.bootstrap_disk }}
 pullSecret: |
   {{ lookup('file',playbook_dir+"/files/pull-secret") }}
 sshKey: |

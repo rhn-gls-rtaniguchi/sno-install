@@ -13,6 +13,12 @@
     - "{{ ignitions_directory }}"
     - "/var/lib/tftpboot/pxelinux.cfg/"
 
+# First make sure all target locations exist
+- name: Create the download directories if not there yet
+  ansible.builtin.file:
+    path: "/home/kiosk/tmp"
+    state: directory
+
 # Downloads often fail ("handshake timed out" blabla) so do them first.
 - name: Download tools
   get_url:

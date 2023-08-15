@@ -27,6 +27,7 @@
     owner: kiosk
     group: kiosk
 
+
 - name: Create a backup copy of install config
   become: no
   copy:
@@ -37,26 +38,32 @@
     owner: kiosk
     group: kiosk
 
-- name: Create installation manifests
+- name: Create a copy to merge with the workarounds
   become: no
-  shell: openshift-install create manifests
-  args:
-    chdir: /home/kiosk/{{ node.cluster }}
-
-- name: Deploy the network config customization
-  become: no
-  template:
-    src: templates/netcfg.bu.j2
-    dest: /home/kiosk/netcfg.bu
+  copy:
+    src: /home/kiosk/{{ node.cluster }}/install-config.yaml
+    dest: /home/kiosk/tmp/install-config.yaml
+    remote_src: yes
     mode: 0644
     owner: kiosk
     group: kiosk
 
-- name: Process network config with butane
+
+- name: Deploy the environment workarounds
   become: no
-  shell: butane netcfg.bu -o {{ node.cluster }}/openshift/01-master-network.yaml
+  template:
+    src: templates/bootstrap.bu.j2
+    dest: /home/kiosk/bootstrap.yaml
+    mode: 0644
+    owner: kiosk
+    group: kiosk
+
+- name: Process workaround config with butane
+  become: no
+  shell: butane bootstrap.yaml -d /home/kiosk/tmp -o /home/kiosk/{{ node.cluster }}/install-config-{{ node.cluster }}.yaml  
   args:
     chdir: /home/kiosk
+
 
 - name: Create the ignition file
   become: no

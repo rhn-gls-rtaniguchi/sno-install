@@ -14,8 +14,7 @@
       role: SNO
       cluster: sno1
 # adjust your disk accordingly
-      bootstrap_disk: /dev/nvme0n1
-      inst_disk: /dev/sda
+      bootstrap_disk: /dev/sda
       online: yes
   pre_tasks:
     - name: Put the pull-secret onto kiosk VM

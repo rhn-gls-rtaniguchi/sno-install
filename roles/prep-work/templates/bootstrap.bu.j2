@@ -1,0 +1,173 @@
+variant: openshift
+version: 4.13.0
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: bootstrap
+ignition:
+  config:
+    merge:
+      - local: install-config.yaml
+storage:
+  files:
+    - path: /etc/zincati/config.d/90-disable-feature.toml
+      mode: 0644
+      contents:
+        inline: |
+          [updates]
+          enabled = false
+    - path: /etc/systemd/network/25-{{ node.network_adapter }}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          MACAddress={{node.mac}}
+          [Link]
+          Name={{ node.network_adapter }}
+    - path: /etc/NetworkManager/system-connections/{{ node.network_adapter }}.nmconnection
+      mode: 0600
+      overwrite: true
+      contents:
+        inline: |
+          [connection]
+          type=ethernet
+          interface-name={{ node.network_adapter }}
+          
+          [ethernet]
+          mac-address={{ node.mac }}
+          
+          [ipv4]
+          method=manual
+          addresses={{ node.ip }}/24
+          gateway=172.25.254.250
+          dns=172.25.254.250
+          dns-search={{ node.cluster }}.example.com
+    - path: /etc/hostname
+      mode: 0420
+      overwrite: true
+      contents:
+        inline: |
+          {{ node.name }}.{{ node.cluster }}.example.com      
+    - path: /opt/openshift/openshift/98_openshift-machineconfig_98-master-config-bip.yaml
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          variant: openshift
+          version: 4.13.0
+          metadata:
+            labels:
+              machineconfiguration.openshift.io/role: master
+            name: config-bip
+          storage:
+            files:
+              - path: /etc/zincati/config.d/90-disable-feature.toml
+                mode: 0644
+                contents:
+                  inline: |
+                    [updates]
+                    enabled = false
+              - path: /etc/systemd/network/25-{{ node.network_adapter }}.link
+                mode: 0644
+                contents:
+                  inline: |
+                    [Match]
+                    MACAddress={{node.mac}}
+                    [Link]
+                    Name={{ node.network_adapter }}
+              - path: /etc/NetworkManager/system-connections/{{ node.network_adapter }}.nmconnection
+                mode: 0600
+                overwrite: true
+                contents:
+                  inline: |
+                    [connection]
+                    type=ethernet
+                    interface-name={{ node.network_adapter }}
+
+                    [ethernet]
+                    mac-address={{ node.mac }}
+
+                    [ipv4]
+                    method=manual
+                    addresses={{ node.ip }}/24
+                    gateway=172.25.254.250
+                    dns=172.25.254.250
+                    dns-search={{ node.cluster }}.example.com
+              - path: /etc/hostname
+                mode: 0420
+                overwrite: true
+                contents:
+                  inline: |
+                    {{ node.name }}.{{ node.cluster }}.example.com
+          systemd:
+            units:
+            - name: systemd-mkfs@{{ node.bootstrap_disk }}.service
+              enabled: true
+              contents: |
+                [Unit]
+                Description=Make File System on {{ node.bootstrap_disk }}
+                DefaultDependencies=no
+                BindsTo={{ node.bootstrap_disk }}.device
+                After={{ node.bootstrap_disk }}.device var.mount
+                Before=systemd-fsck@{{node.bootstrap_disk }}.service
+
+                [Service]
+                Type=oneshot
+                RemainAfterExit=yes
+                ExecStart=/usr/lib/systemd/systemd-makefs ext4 {{ node.bootstrap_disk }}
+                TimeoutSec=0
+
+                [Install]
+                WantedBy=hostpath.mount
+
+            - name: var-hostpath.mount
+              enabled: true
+              contents: |
+                [Unit]
+                Description=Mount {{ node.bootstrap_disk }} to /var/hostpath
+                Before=local-fs.target
+                Requires=systemd-mkfs@{{ node.bootstrap_disk }}.service
+                After=systemd-mkfs@{{ node.bootstrap_disk }}.service
+
+                [Mount]
+                What={{ node.bootstrap_disk }}
+                Where=/var/hostpath
+                Type=ext4
+                Options=defaults
+
+                [Install]
+                WantedBy=local-fs.target
+
+            - name: systemd-clear-journal.service
+              enabled: true
+              contents: |
+                [Unit]
+                Description=Clear Journal to Remove Corrupt File
+                DefaultDependencies=no
+                After=kubelet.service
+
+                [Service]
+                Type=oneshot
+                RemainAfterExit=yes
+                ExecStart=bash -c "/usr/bin/journalctl --rotate && /usr/bin/journalctl --vacuum-time=1s"
+                TimeoutSec=0
+
+                [Install]
+                WantedBy=multi-user.target
+systemd:
+  units:
+  - contents: |
+      [Unit]
+      Description=Wipe Boot Disk After BootKube Completes
+      Wants=bootkube.service
+      After=bootkube.service
+      ConditionPathExists=/opt/openshift/.bootkube.done
+
+      [Service]
+      WorkingDirectory=/
+      ExecStart=/bin/bash -c "/usr/sbin/wipefs -af {{ node.bootstrap_disk }} && /usr/sbin/reboot"
+
+      [Install]
+      WantedBy=multi-user.target
+    enabled: true
+    name: wipe-boot-dev.service

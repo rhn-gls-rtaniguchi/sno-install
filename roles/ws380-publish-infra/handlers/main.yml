@@ -17,4 +17,19 @@
     enabled: yes
     state: restarted
 
+- name: restart_httpd
+  service:
+    name: httpd
+    enabled: yes
+    state: restarted
+- name: restart_haproxy
+  service:
+    name: haproxy
+    enabled: yes
+    state: restarted    
+
+- name: restart_firewall
+  service:
+    name: firewalld
+    state: reloaded
 ...

@@ -9,17 +9,21 @@
 # REQUIRES:
 #  - variable "node" according to vms structure
 #
-
 #
 # If you have an issue with a network adapter that cannot come up at all during PXE boot, consider adding:
 # pcie_aspm=off pcie_port_pm=off to the linuxefi line
+
 - name: Deploy EFI config file
   ansible.builtin.blockinfile:
     insertafter: '# BEGIN ANSIBLE MANAGED DHCP CONFIG'
     path: /var/lib/tftpboot/grub.cfg
     block: |
+      menuentry 'Install Bootstrap' --class fedora --class gnu-linux --class gnu --class os {
+      linuxefi rhcos-vmlinuz initrd=rhcos-initrd.img,rhcos-rootfs.img ip={{ bootstrap.ip }}::172.25.254.250:255.255.255.0:{{ bootstrap.name }}.{{ node.cluster }}.example.com:{{ node.network_adapter }}:none:172.25.254.250 rd.neednet=1 console=tty0 random.trust_cpu=on ignition.firstboot ignition.platform.id=metal coreos.inst.install_dev=/dev/sda coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img coreos.inst.ignition_url={{ ignitions_url }}/{{ node.cluster }}-{{ node.name }}.ign 
+      initrdefi rhcos-initrd.img 
+      } 
       menuentry 'Install Single Node OpenShift' --class fedora --class gnu-linux --class gnu --class os {
-      linuxefi rhcos-vmlinuz initrd=rhcos-initrd.img,rhcos-rootfs.img ip={{ node.ip }}::172.25.254.250:255.255.255.0:{{ node.name }}.{{ node.cluster }}.example.com:{{ node.network_adapter }}:none:172.25.254.250 rd.neednet=1 console=tty0 random.trust_cpu=on ignition.firstboot ignition.platform.id=metal coreos.inst.install_dev={{ node.inst_disk }} coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img coreos.inst.ignition_url={{ ignitions_url }}/{{ node.cluster }}-{{ node.name }}.ign 
+      linuxefi rhcos-vmlinuz initrd=rhcos-initrd.img,rhcos-rootfs.img pcie_aspm=off pcie_port_pm=off ip={{ node.ip }}::172.25.254.250:255.255.255.0:{{ node.name }}.{{ node.cluster }}.example.com:{{ node.network_adapter }}:none:172.25.254.250 rd.neednet=1 console=tty0 random.trust_cpu=on ignition.firstboot ignition.platform.id=metal coreos.inst.install_dev={{ node.bootstrap_disk }} coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img coreos.inst.ignition_url={{ ignitions_url }}/{{ node.cluster }}-{{ node.name }}.ign 
       initrdefi rhcos-initrd.img 
       } 
 

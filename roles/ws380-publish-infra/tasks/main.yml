@@ -63,8 +63,86 @@
     mode: 0644
     owner: root
 
+- name: Change HTTPD port
+  ansible.builtin.lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^Listen'
+    line: Listen 9000
+    state: present
+  notify: restart_httpd
+
+- name: Change HTTPS port
+  ansible.builtin.lineinfile:
+    path: /etc/httpd/conf.d/ssl.conf
+    regexp: '^Listen'
+    line: Listen 8443
+    state: present
+  notify: restart_httpd
+
+- name: Install HAProxy dependencies
+  ansible.builtin.yum:
+    name: haproxy
+    state: installed
+
+- name: Enable SELinux Network ports on HAProxy
+  community.general.seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_cache_port_t
+    state: present
+  loop:
+    - 6443
+    - 22623
+    - 32700
+
+- name: Enable SELinux Network ports on HAProxy
+  community.general.seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  loop:
+    - 6443
+    - 22623
+    - 32700
+
+- name: Enable SELinux Network ports on HAProxy
+  community.general.seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  loop:
+    - 6443
+    - 22623
+    - 32700
 
 
+- name: Enable Firewall Rules for HAProxy
+  ansible.posix.firewalld:
+    permanent: true
+    port: "{{ item }}"
+    state: enabled
+  loop:
+    - 6443/tcp
+    - 80/tcp
+    - 443/tcp
+    - 22623/tcp
+    - 32700/tcp
+  notify: restart_firewall
+
+
+  # haproxy configuration
+- name: Publish base haproxy.cfg
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart_haproxy
+
+  
 # pxe boot config
 # - name: Publish default PXE configuration file
 #   copy:

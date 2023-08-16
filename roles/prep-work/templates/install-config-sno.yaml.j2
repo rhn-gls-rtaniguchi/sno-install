@@ -17,4 +17,4 @@ BootstrapInPlace:
 pullSecret: |
   {{ lookup('file',playbook_dir+"/files/pull-secret") }}
 sshKey: |
-  {{lookup('file', playbook_dir+"/files/id_rsa.pub")}}
+  {{ lookup('file', playbook_dir+"/files/id_rsa.pub") }}

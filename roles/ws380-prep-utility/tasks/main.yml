@@ -27,16 +27,6 @@
     group: root
     mode: 0755
 
-# Deploy coreos-installer
-- name: Copy coreos-installer into its place
-  ansible.builtin.copy:
-    src: "{{ binaries_directory }}/{{ tools.rhcos_inst.bin }}"
-    dest: /usr/local/bin/coreos-installer
-    remote_src: yes
-    owner: root
-    group: root
-    mode: 0755
-
 
 # Copy files into the tftp server
 - name: Copy kernel into tftp

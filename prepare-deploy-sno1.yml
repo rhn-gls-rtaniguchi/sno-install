@@ -6,25 +6,27 @@
   vars:
     node: 
       name: node
-      ip: 172.25.254.225
+      ip: 172.25.254.230
         # adjust the MAC Address:        
-      mac: "c8-d3-ff-a5-40-96"
+      mac: "01-54-e1-ad-f2-84-3b"
         # Adjust the network adapter name
-      network_adapter: eno1
+      network_adapter: enp2s0
       role: SNO
       cluster: sno1
-# adjust your disk accordingly
+      # adjust your disk accordingly  
       bootstrap_disk: /dev/sda
-      online: yes
+    bootstrap:
+      name: bootstrap
+      ip: 172.25.254.225
+      mac: "52:54:00:7a:1e:a2"
   pre_tasks:
     - name: Put the pull-secret onto kiosk VM
       become: no
       ansible.builtin.copy:
         src: files/pull-secret
         dest: /home/kiosk/pull-secret
-        owner: kiosk
-        group: kiosk
         mode: 0600
+      
   roles:
     - role: ws380-cleanup
       tags: cleanup

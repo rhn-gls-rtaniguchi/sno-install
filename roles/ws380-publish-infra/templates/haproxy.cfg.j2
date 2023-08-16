@@ -1,0 +1,103 @@
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+    # utilize system-wide crypto-policies
+    ssl-default-bind-ciphers PROFILE=SYSTEM
+    ssl-default-server-ciphers PROFILE=SYSTEM
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+# ---------------------------------------------------------------------
+# Exposing HAProxy Statistic Page
+# ---------------------------------------------------------------------
+listen stats
+    bind :32700
+    stats enable
+    stats uri /
+    stats hide-version
+    stats auth admin:RedH@t380
+
+
+# BEGIN STATIC OCP4 CLUSTER HAPROXY CONFIG
+frontend k8s_api_ocp4
+    bind 172.25.254.250:6443
+    mode tcp
+    default_backend k8s_api_backend_ocp4
+
+backend k8s_api_backend_ocp4
+    balance roundrobin
+    mode tcp
+    server bootstrap {{ bootstrap.ip }}:6443 check
+    server node {{ node.ip }}:6443 check
+                    
+frontend machine_config_ocp4
+    bind 172.25.254.250:22623
+    mode tcp
+    default_backend machine_config_backend_ocp4
+
+backend machine_config_backend_ocp4
+    balance roundrobin
+    mode tcp
+    server bootstrap {{ bootstrap.ip }}:22623 check
+    server node {{ node.ip }}:22623 check
+# END STATIC OCP4 CLUSTER HAPROXY CONFIG
+                    
+# BEGIN DYNAMIC OCP4 CLUSTER INSECURE HAPROXY CONFIG
+frontend ingress_insecure_ocp4
+    bind 172.25.254.250:80
+    mode tcp
+    default_backend ingress_insecure_backend_ocp4
+
+backend ingress_insecure_backend_ocp4
+    balance roundrobin
+    mode tcp
+    server node {{ node.ip }}:80 check
+    
+# END DYNAMIC OCP4 CLUSTER INSECURE HAPROXY CONFIG
+  
+# BEGIN DYNAMIC OCP4 CLUSTER SECURE HAPROXY CONFIG
+frontend ingress_secure_ocp4
+    bind 172.25.254.250:443
+    mode tcp
+    default_backend ingress_secure_backend_ocp4
+backend ingress_secure_backend_ocp4
+    balance roundrobin
+    mode tcp
+    server node {{ node.ip }}::443 check
+# END DYNAMIC OCP4 CLUSTER SECURE HAPROXY CONFIG
+
+# BEGIN DYNAMIC OTHER CLUSTER HAPROXY CONFIG
+# END DYNAMIC OTHER CLUSTER HAPROXY CONFIG

@@ -15,8 +15,13 @@
     path: /home/kiosk/{{ node.cluster }}
     state: directory
     mode: 0755
-    owner: kiosk
-    group: kiosk
+
+# First make sure all target locations exist
+- name: Create the download directories if not there yet
+  become: no
+  ansible.builtin.file:
+    path: "/home/kiosk/tmp"
+    state: directory
 
 - name: Place the install config to workdir
   become: no
@@ -24,8 +29,6 @@
     src: templates/install-config-sno.yaml.j2
     dest: /home/kiosk/{{ node.cluster }}/install-config.yaml
     mode: 0644
-    owner: kiosk
-    group: kiosk
 
 
 - name: Create a backup copy of install config
@@ -35,8 +38,6 @@
     dest: /home/kiosk/install-config-{{ node.cluster }}.yaml
     remote_src: yes
     mode: 0644
-    owner: kiosk
-    group: kiosk
 
 - name: Create a copy to merge with the workarounds
   become: no
@@ -45,8 +46,6 @@
     dest: /home/kiosk/tmp/install-config.yaml
     remote_src: yes
     mode: 0644
-    owner: kiosk
-    group: kiosk
 
 
 - name: Deploy the environment workarounds
@@ -55,8 +54,6 @@
     src: templates/bootstrap.bu.j2
     dest: /home/kiosk/bootstrap.yaml
     mode: 0644
-    owner: kiosk
-    group: kiosk
 
 - name: Process workaround config with butane
   become: no
@@ -87,8 +84,6 @@
     src: /home/kiosk/{{ node.cluster }}/auth/{{ item }}
     dest: /home/kiosk/{{ item }}-{{ node.cluster }}
     remote_src: yes
-    owner: kiosk
-    group: kiosk
     mode: 0644
   loop:
     - kubeadmin-password

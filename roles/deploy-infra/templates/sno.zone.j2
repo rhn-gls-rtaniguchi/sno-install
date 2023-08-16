@@ -8,10 +8,13 @@ $TTL  1D
 		)
 		IN NS dns.ocp4.example.com.
 
-api		IN A {{ node.ip }}
-api-int		IN A {{ node.ip }}
-*.apps		IN A {{ node.ip }}
-
-{{ node.name }} IN A {{ node.ip }}
+bootstrap  					IN A {{ bootstrap.ip }}
+*.apps						IN A {{ node.ip }}
+api							IN A {{ node.ip }}
+api							IN A {{ bootstrap.ip }}
+api-int						IN A {{ node.ip }}
+api-int						IN A {{ bootstrap.ip }}
+{{ node.name }} 			IN A {{ node.ip }}
+etcd-0						IN A {{ node.ip }}
 
 ; End of {{ node.cluster }}.example.com.zone

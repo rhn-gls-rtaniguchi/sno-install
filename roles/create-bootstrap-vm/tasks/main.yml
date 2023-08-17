@@ -4,7 +4,6 @@
       - guestfs-tools
       - python3-libvirt
     state: present
-    become: yes
 - name: Get VMs list
   community.libvirt.virt:
     command: list_vms

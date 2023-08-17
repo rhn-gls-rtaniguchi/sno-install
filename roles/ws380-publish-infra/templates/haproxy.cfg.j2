@@ -96,7 +96,7 @@ frontend ingress_secure_ocp4
 backend ingress_secure_backend_ocp4
     balance roundrobin
     mode tcp
-    server node {{ node.ip }}::443 check
+    server node {{ node.ip }}:443 check
 # END DYNAMIC OCP4 CLUSTER SECURE HAPROXY CONFIG
 
 # BEGIN DYNAMIC OTHER CLUSTER HAPROXY CONFIG

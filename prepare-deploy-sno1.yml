@@ -34,6 +34,8 @@
       tags: fetch
     - role: ws380-prep-utility
       tags: prep
+    - role: create-bootstrap-vm
+      tags: prep
     - role: ws380-publish-infra
       tags: publish
     - role: check-env

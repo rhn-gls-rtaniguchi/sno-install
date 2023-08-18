@@ -16,8 +16,4 @@
     command: define
     xml: "{{ lookup('template', 'bootstrap.xml.j2') }}"
     autostart: yes
-
-- name: Start Bootstrap vm
-  community.libvirt.virt:
-    name: "{{ bootstrap.name }}"
-    command: start
+  notify: bootstrap_start

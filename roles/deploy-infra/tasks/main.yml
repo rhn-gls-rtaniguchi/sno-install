@@ -52,13 +52,23 @@
   notify:
     - reload_named
 
-- name: Update reverse DNS zone
+- name: Update reverse DNS zone for SNO
   lineinfile:
     path: /var/named/254.25.172.in-addr.arpa.zone
     insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
     line: "{{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."
     state: present
   register: zoneupdate
+
+- name: Update reverse DNS zone for bootstrap
+  lineinfile:
+    path: /var/named/254.25.172.in-addr.arpa.zone
+    insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
+    line: "{{ bootstrap.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ bootstrap.name }}.{{ node.cluster }}.example.com."
+    state: present
+  register: zoneupdate
+
+
 
 - name: Extract the serial if rzone was updated
   shell: grep -i serial /var/named/254.25.172.in-addr.arpa.zone | awk '{ print $1 }'
@@ -80,7 +90,7 @@
   notify:
     - reload_named
 
-- name: Make sure DHCP server recognizes us
+- name: Make sure DHCP server recognizes SNO
   blockinfile:
     path: /etc/dhcp/dhcpd.conf
     insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
@@ -89,6 +99,21 @@
             hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; 
             fixed-address {{ node.ip }}; 
             option host-name "{{ node.name }}.{{ node.cluster }}.example.com"; 
+            option domain-name "{{ node.cluster }}.example.com"; 
+            option domain-search "{{ node.cluster }}.example.com"; 
+      }
+    state: present
+  notify: restart_dhcpd
+
+- name: Make sure DHCP server recognizes Bootstrap
+  blockinfile:
+    path: /etc/dhcp/dhcpd.conf
+    insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
+    block: |
+      host {{ bootstrap.name }}-{{ node.cluster }} { 
+            hardware ethernet {{ bootstrap.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; 
+            fixed-address {{ bootstrap.ip }}; 
+            option host-name "{{ bootstrap.name }}.{{ node.cluster }}.example.com"; 
             option domain-name "{{ node.cluster }}.example.com"; 
             option domain-search "{{ node.cluster }}.example.com"; 
       }

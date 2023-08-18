@@ -14,7 +14,7 @@
         dest: /var/lib/libvirt/images/bootstrap.qcow2
         
     - name: Define vm
-      community.libvirt.virt:
+      community.libvirt.virt:git 
         command: define
         xml: "{{ lookup('template', 'bootstrap.xml.j2') }}"
         autostart: yes

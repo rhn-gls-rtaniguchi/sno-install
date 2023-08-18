@@ -96,7 +96,7 @@
 
 - name: Publish {{ item }} ignition configs
   copy:
-    src: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
+    src: /home/kiosk/tmp/{{ item }}.ign
     dest: "{{ ignitions_directory }}"
     remote_src: yes
     mode: 0644

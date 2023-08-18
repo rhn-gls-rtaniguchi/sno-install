@@ -1,0 +1,4 @@
+- name: bootstrap_start
+  community.libvirt.virt:
+    name: "{{ bootstrap.name }}"
+    command: start

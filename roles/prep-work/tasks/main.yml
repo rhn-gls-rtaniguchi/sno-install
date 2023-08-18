@@ -9,6 +9,16 @@
 
     
 # Create the OCP installation directory and populate it
+
+- name: Delete dirs
+  become: no
+  file:
+    path: /home/kiosk/{{ item }}
+    state: absent
+  loop: 
+    - "{{ node.cluster }}"
+    - tmp
+
 - name: Make sure dirs exists
   become: no
   file:
@@ -18,6 +28,8 @@
   loop: 
     - "{{ node.cluster }}"
     - tmp
+
+
 
 - name: Place the install config to workdir
   become: no
@@ -32,7 +44,7 @@
   copy:
     src: /home/kiosk/{{ node.cluster }}/install-config.yaml
     dest: /home/kiosk/install-config-{{ node.cluster }}.yaml
-    remote_src: yes
+    remote_src: no
     mode: 0644
 
 
@@ -42,25 +54,25 @@
   args:
     chdir: /home/kiosk/{{ node.cluster }}
 
-- block:
-  - name: Move {{ item }} ignition files to tmp dir to process butane configurations
-    become: no
-    copy:
-      src: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
-      dest: /home/kiosk/tmp/{{ item }}.ign
-      remote_src: yes
-      mode: 0644
-    loop:
-      - bootstrap
-      - master      
-  - name: Delete {{ item }} ignition file
-    become: no
-    file:
-      state: absent
-      path: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
-    loop:
-      - bootstrap
-      - master
+- name: Move {{ item }} ignition files to tmp dir to process butane configurations
+  become: no
+  copy:
+    src: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
+    dest: /home/kiosk/tmp/{{ item }}.ign
+    remote_src: no
+    mode: 0644
+  loop:
+    - bootstrap
+    - master      
+- name: Delete {{ item }} ignition file
+  become: no
+  file:
+    state: absent
+    path: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
+  loop:
+    - bootstrap
+    - master
+    - worker
 
 
 - name: Deploy the environment workarounds

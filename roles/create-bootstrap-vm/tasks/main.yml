@@ -1,19 +1,22 @@
+
+# Create the block to check whether the bootstrap VM is up and running
 - name: Get VMs list
   community.libvirt.virt:
     command: list_vms
   register: existing_vms
   changed_when: no
 
-# Create the block to check whether the bootstrap VM is up and running
-
-- name: Copy the storage volume used by the bootstrap VM
-  ansible.builtin.copy:
-    src: files/bootstrap.qcow2
-    dest: /var/lib/libvirt/images/bootstrap.qcow2
-    
-- name: Define vm
-  community.libvirt.virt:
-    command: define
-    xml: "{{ lookup('template', 'bootstrap.xml.j2') }}"
-    autostart: yes
-  notify: bootstrap_start
+- name: Create VM if not exists
+  block:
+    - name: Copy the storage volume used by the bootstrap VM
+      ansible.builtin.copy:
+        src: files/bootstrap.qcow2
+        dest: /var/lib/libvirt/images/bootstrap.qcow2
+        
+    - name: Define vm
+      community.libvirt.virt:
+        command: define
+        xml: "{{ lookup('template', 'bootstrap.xml.j2') }}"
+        autostart: yes
+      notify: bootstrap_start
+  when: "bootstrap.name not in existing_vms.list_vms"

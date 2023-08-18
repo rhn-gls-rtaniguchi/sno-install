@@ -27,7 +27,7 @@
 - name: Deploy PXE config file
   ansible.builtin.template:
     src: pxe-sno.j2
-    path: /var/lib/tftpboot/pxeconfig.cfg/default
+    dest: /var/lib/tftpboot/pxelinux.cfg/default
 
 - name: Publish forward DNS zone
   template:

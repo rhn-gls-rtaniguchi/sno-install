@@ -18,7 +18,8 @@
     bootstrap:
       name: bootstrap
       ip: 172.25.254.225
-      mac: "52:54:00:7a:1e:a2"
+      mac: "52-54-00-7a-1e-a2"
+      network_adapter: br0
   pre_tasks:
     - name: Put the pull-secret onto kiosk VM
       become: no

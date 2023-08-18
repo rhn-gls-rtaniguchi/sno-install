@@ -3,11 +3,11 @@ version: 4.13.0
 metadata:
   labels:
     machineconfiguration.openshift.io/role: master
-  name: bootstrap
+  name: master
 ignition:
   config:
     merge:
-      - local: bootstrap.ign
+      - local: master.ign
 storage:
   files:
     - path: /etc/zincati/config.d/90-disable-feature.toml
@@ -16,29 +16,29 @@ storage:
         inline: |
           [updates]
           enabled = false
-    - path: /etc/systemd/network/25-{{ bootstrap.network_adapter }}.link
+    - path: /etc/systemd/network/25-{{ node.network_adapter }}.link
       mode: 0644
       contents:
         inline: |
           [Match]
-          MACAddress={{ bootstrap.mac }}
+          MACAddress={{node.mac}}
           [Link]
-          Name={{ bootstrap.network_adapter }}
-    - path: /etc/NetworkManager/system-connections/{{ bootstrap.network_adapter }}.nmconnection
+          Name={{ node.network_adapter }}
+    - path: /etc/NetworkManager/system-connections/{{ node.network_adapter }}.nmconnection
       mode: 0600
       overwrite: true
       contents:
         inline: |
           [connection]
           type=ethernet
-          interface-name={{ bootstrap.network_adapter }}
+          interface-name={{ node.network_adapter }}
           
           [ethernet]
-          mac-address={{ bootstrap.mac }}
+          mac-address={{ node.mac }}
           
           [ipv4]
           method=manual
-          addresses={{ bootstrap.ip }}/24
+          addresses={{ node.ip }}/24
           gateway=172.25.254.250
           dns=172.25.254.250
           dns-search={{ node.cluster }}.example.com
@@ -47,7 +47,7 @@ storage:
       overwrite: true
       contents:
         inline: |
-          {{ bootstrap.name }}.{{ node.cluster }}.example.com      
+          {{ node.name }}.{{ node.cluster }}.example.com      
 systemd:
   units:
   - contents: |

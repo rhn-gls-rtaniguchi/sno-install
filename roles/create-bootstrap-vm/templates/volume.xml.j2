@@ -1,0 +1,14 @@
+<volume>
+	<name>{{ bootstrap.name }}</name>
+	<allocation>0</allocation>
+	<capacity unit="G">50</capacity>
+	<target>
+		<path>/var/lib/libvirt/images/{{ bootstrap.name }}</path>
+		<permissions>
+			<owner>107</owner>
+			<group>107</group>
+            		<mode>0744</mode>
+            		<label>virt_image_t</label>
+          	</permissions>
+        </target>
+</volume>

@@ -12,8 +12,6 @@ controlPlane:
   replicas: 1
 platform:
   none: {}
-BootstrapInPlace:
-  InstallationDisk: {{ node.bootstrap_disk }}
 pullSecret: |
   {{ lookup('file',playbook_dir+"/files/pull-secret") }}
 sshKey: |

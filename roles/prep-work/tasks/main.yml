@@ -9,19 +9,15 @@
 
     
 # Create the OCP installation directory and populate it
-- name: Make sure workdir exists
+- name: Make sure dirs exists
   become: no
   file:
-    path: /home/kiosk/{{ node.cluster }}
+    path: /home/kiosk/{{ item }}
     state: directory
     mode: 0755
-
-# First make sure all target locations exist
-- name: Create the download directories if not there yet
-  become: no
-  ansible.builtin.file:
-    path: "/home/kiosk/tmp"
-    state: directory
+  loop: 
+    - "{{ node.cluster }}"
+    - tmp
 
 - name: Place the install config to workdir
   become: no
@@ -39,43 +35,64 @@
     remote_src: yes
     mode: 0644
 
-- name: Create a copy to merge with the workarounds
+
+- name: Create the ignition file
   become: no
-  copy:
-    src: /home/kiosk/{{ node.cluster }}/install-config.yaml
-    dest: /home/kiosk/tmp/install-config.yaml
-    remote_src: yes
-    mode: 0644
+  shell: openshift-install create ignition-configs
+  args:
+    chdir: /home/kiosk/{{ node.cluster }}
+
+- block:
+  - name: Move {{ item }} ignition files to tmp dir to process butane configurations
+    become: no
+    copy:
+      src: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
+      dest: /home/kiosk/tmp/{{ item }}.ign
+      remote_src: yes
+      mode: 0644
+    loop:
+      - bootstrap
+      - master      
+  - name: Delete {{ item }} ignition file
+    become: no
+    file:
+      state: absent
+      path: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
+    loop:
+      - bootstrap
+      - master
 
 
 - name: Deploy the environment workarounds
   become: no
   template:
-    src: templates/bootstrap.bu.j2
-    dest: /home/kiosk/bootstrap.yaml
+    src: templates/{{ item }}.bu.j2
+    dest: /home/kiosk/{{ item }}.yaml
     mode: 0644
+  loop:
+    - bootstrap
+    - master
 
-- name: Process workaround config with butane
+- name: Process {{ item }} config with butane
   become: no
-  shell: butane bootstrap.yaml -d /home/kiosk/tmp -o /home/kiosk/{{ node.cluster }}/install-config-{{ node.cluster }}.yaml  
+  shell: butane {{ item }}.yaml -d /home/kiosk/tmp -o /home/kiosk/{{ node.cluster }}/{{ item }}.ign  
   args:
     chdir: /home/kiosk
+  loop:
+    - bootstrap
+    - master
 
-
-- name: Create the ignition file
-  become: no
-  shell: openshift-install create single-node-ignition-config
-  args:
-    chdir: /home/kiosk/{{ node.cluster }}
-
-- name: Publish ignition configs
+- name: Publish {{ item }} ignition configs
   copy:
-    src: /home/kiosk/{{ node.cluster }}/bootstrap-in-place-for-live-iso.ign
-    dest: "{{ ignitions_directory }}/{{ node.cluster }}-{{ node.name }}.ign"
+    src: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
+    dest: "{{ ignitions_directory }}"
     remote_src: yes
     mode: 0644
     owner: root
     group: root
+  loop:
+    - bootstrap
+    - master
 
 # Create a backup copy of cluster auth files
 - name: Create a backup copy of cluster auth files

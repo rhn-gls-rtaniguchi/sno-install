@@ -1,15 +1,23 @@
-- name: Ensure requirements in place
-  package:
-    name:
-      - guestfs-tools
-      - python3-libvirt
-    state: present
 - name: Get VMs list
   community.libvirt.virt:
     command: list_vms
   register: existing_vms
   changed_when: no
+
+# Create the block to check whether the bootstrap VM is up and running
+
+- name: Copy the storage volume used by the bootstrap VM
+  ansible.builtin.copy:
+    src: files/bootstrap.qcow2
+    dest: /var/lib/libvirt/images/bootstrap.qcow2
+    
 - name: Define vm
   community.libvirt.virt:
     command: define
-    xml: "{{ lookup('file', 'bootstrap.xml') }}"
+    xml: "{{ lookup('template', 'bootstrap.xml.j2') }}"
+    autostart: yes
+
+- name: Start Bootstrap vm
+  community.libvirt.virt:
+    name: "{{ bootstrap.name }}"
+    command: start

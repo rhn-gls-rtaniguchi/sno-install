@@ -1,8 +1,11 @@
-default pxeboot
+default vesamenu.c32
 prompt 0
 timeout 86400
-menu title **** OpenShift {{ ocp_z }} Cluster "{{ node.cluster }}" PXE Menu ****
+display boot.msg
 
-label Install CoreOS {{ rhcos_ver }} for a {{ node.cluster }} node
- kernel {{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-kernel-x86_64
- append ip={{ bootstrap.ip }}::172.25.254.250:255.255.255.0:{{ bootstrap.name }}.{{ node.cluster }}.example.com:{{ bootstrap.network_adapter }}:none:172.25.254.250 rd.neednet=1 console=ttyS0 initrd={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img,{{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img ignition.config.url={{ ignitions_url }}/bootstrap.ign random.trust_cpu=on ignition.firstboot ignition.platform.id=qemu
+menu title **** OpenShift {{ ocp_z }} Cluster "{{ bootstrap.name }}" PXE Menu ****
+
+label Install CoreOS {{ rhcos_ver }} for bootstrap node
+ ipappend 2
+ kernel rhcos-vmlinuz
+ append ip={{ bootstrap.ip }}::172.25.254.250:255.255.255.0:{{ bootstrap.name }}.{{ node.cluster }}.example.com:{{ bootstrap.network_adapter }}:none:172.25.254.250 rd.neednet=1 random.trust_cpu=on ignition.firstboot coreos.inst=yes ignition.platform.id=qemu console=ttyS0 initrd=rhcos-initrd.img coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img ignition.config.url={{ ignitions_url }}/bootstrap.ign 

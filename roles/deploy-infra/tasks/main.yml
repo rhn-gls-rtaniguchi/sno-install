@@ -13,6 +13,7 @@
 # If you have an issue with a network adapter that cannot come up at all during PXE boot, consider adding:
 # pcie_aspm=off pcie_port_pm=off to the linuxefi line
 
+
 - name: Deploy EFI config file
   ansible.builtin.blockinfile:
     insertafter: '# BEGIN ANSIBLE MANAGED DHCP CONFIG'
@@ -25,9 +26,15 @@
 
 
 - name: Deploy PXE config file
-  ansible.builtin.template:
-    src: pxe-sno.j2
-    dest: /var/lib/tftpboot/pxelinux.cfg/default
+  template:
+    src: templates/pxe-sno.j2
+    dest: /var/lib/tftpboot/pxelinux.cfg/{{ node.cluster }}-{{ bootstrap.name }}
+
+- name: Create symbolic link to PXE boot entry
+  file:
+    path: /var/lib/tftpboot/pxelinux.cfg/default
+    src: "{{ node.cluster }}-{{ bootstrap.name }}"
+    state: link
 
 - name: Publish forward DNS zone
   template:
@@ -103,14 +110,6 @@
             option domain-name "{{ node.cluster }}.example.com"; 
             option domain-search "{{ node.cluster }}.example.com"; 
       }
-    state: present
-  notify: restart_dhcpd
-
-- name: Make sure DHCP server recognizes Bootstrap
-  blockinfile:
-    path: /etc/dhcp/dhcpd.conf
-    insertafter: "^# BEGIN ANSIBLE MANAGED DHCP CONFIG$"
-    block: |
       host {{ bootstrap.name }}-{{ node.cluster }} { 
             hardware ethernet {{ bootstrap.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; 
             fixed-address {{ bootstrap.ip }}; 
@@ -120,4 +119,5 @@
       }
     state: present
   notify: restart_dhcpd
+
 ...

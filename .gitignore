@@ -12,5 +12,5 @@
 .vagrant/rgloader/loader.rb
 .vscode/*
 testing.yml
-inventory.sample
+inventory
 

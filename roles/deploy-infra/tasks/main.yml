@@ -61,18 +61,12 @@
     - reload_named
 
 - name: Update reverse DNS zone for SNO
-  lineinfile:
+  blockinfile:
     path: /var/named/254.25.172.in-addr.arpa.zone
     insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
-    line: "{{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com."
-    state: present
-  register: zoneupdate
-
-- name: Update reverse DNS zone for bootstrap
-  lineinfile:
-    path: /var/named/254.25.172.in-addr.arpa.zone
-    insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
-    line: "{{ bootstrap.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ bootstrap.name }}.{{ node.cluster }}.example.com."
+    block: |
+      {{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com.
+      {{ bootstrap.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ bootstrap.name }}.{{ node.cluster }}.example.com.
     state: present
   register: zoneupdate
 

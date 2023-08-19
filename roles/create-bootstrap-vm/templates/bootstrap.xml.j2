@@ -58,6 +58,11 @@
       <mac address="{{ bootstrap.mac | replace('-',':') }}"/>
       <model type="virtio"/>
     </interface>
+    <interface type="bridge">
+      <source bridge="br1"/>
+      <mac address="52:54:00:01:00:FE"/>
+      <model type="virtio"/>
+    </interface>
     <console type="pty"/>
     <channel type="unix">
       <source mode="bind"/>

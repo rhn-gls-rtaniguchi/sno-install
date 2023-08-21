@@ -8,18 +8,13 @@
       name: node
       ip: 172.25.254.230
         # adjust the MAC Address:        
-      mac: "01-54-e1-ad-f2-84-3b"
+      mac: "80:e8:2c:15:3b:0c"
         # Adjust the network adapter name
       network_adapter: enp2s0
       role: SNO
       cluster: sno1
       # adjust your disk accordingly  
       bootstrap_disk: /dev/sda
-    bootstrap:
-      name: bootstrap
-      ip: 172.25.254.225
-      mac: "52-54-00-00-00-fe"
-      network_adapter: enp1s0
   pre_tasks:
     - name: Put the pull-secret onto kiosk VM
       become: no
@@ -35,8 +30,6 @@
       tags: fetch
     - role: ws380-prep-utility
       tags: prep
-    - role: create-bootstrap-vm
-      tags: prep
     - role: ws380-publish-infra
       tags: publish
     - role: check-env
@@ -44,7 +37,7 @@
     - role: deploy-infra
       tags: infra
     - role: prep-work
-      tags: prep
+      tags: prep-sno
   post_tasks:
     - name: Notify of completion
       pause:

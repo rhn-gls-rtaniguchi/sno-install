@@ -20,21 +20,10 @@
     path: /var/lib/tftpboot/grub.cfg
     block: |
       menuentry 'Install Single Node OpenShift' --class fedora --class gnu-linux --class gnu --class os {
-      linuxefi rhcos-vmlinuz initrd=rhcos-initrd.img,rhcos-rootfs.img pcie_aspm=off pcie_port_pm=off ip={{ node.ip }}::172.25.254.250:255.255.255.0:{{ node.name }}.{{ node.cluster }}.example.com:{{ node.network_adapter }}:none:172.25.254.250 rd.neednet=1 console=tty0 random.trust_cpu=on ignition.firstboot ignition.platform.id=metal coreos.inst.install_dev={{ node.bootstrap_disk }} coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img coreos.inst.ignition_url={{ ignitions_url }}/master.ign 
-      initrdefi rhcos-initrd.img 
+      linuxefi rhcos-vmlinuz initrd=rhcos-initrd.img pcie_aspm=off pcie_port_pm=off rd.neednet=1 console=tty0 coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img random.trust_cpu=on ignition.firstboot ignition.platform.id=metal coreos.inst.ignition_url={{ ignitions_url }}/{{ node.cluster }}-{{ node.name }}.ign
+      initrdefi rhcos-initrd.img
       } 
 
-
-- name: Deploy PXE config file
-  template:
-    src: templates/pxe-sno.j2
-    dest: /var/lib/tftpboot/pxelinux.cfg/{{ node.cluster }}-{{ bootstrap.name }}
-
-- name: Create symbolic link to PXE boot entry
-  file:
-    path: /var/lib/tftpboot/pxelinux.cfg/default
-    src: "{{ node.cluster }}-{{ bootstrap.name }}"
-    state: link
 
 - name: Publish forward DNS zone
   template:
@@ -66,7 +55,6 @@
     insertafter: "^; BEGIN DYNAMIC rZONE RECORDS$"
     block: |
       {{ node.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ node.name }}.{{ node.cluster }}.example.com.
-      {{ bootstrap.ip | regex_replace('^172.25.254.', '') }}      IN PTR {{ bootstrap.name }}.{{ node.cluster }}.example.com.
     state: present
   register: zoneupdate
 
@@ -101,14 +89,7 @@
             hardware ethernet {{ node.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; 
             fixed-address {{ node.ip }}; 
             option host-name "{{ node.name }}.{{ node.cluster }}.example.com"; 
-            option domain-name "{{ node.cluster }}.example.com"; 
-            option domain-search "{{ node.cluster }}.example.com"; 
-      }
-      host {{ bootstrap.name }}-{{ node.cluster }} { 
-            hardware ethernet {{ bootstrap.mac | regex_replace("^01-", "") | regex_replace("-", ":") }}; 
-            fixed-address {{ bootstrap.ip }}; 
-            option host-name "{{ bootstrap.name }}.{{ node.cluster }}.example.com"; 
-            option domain-name "{{ node.cluster }}.example.com"; 
+            option domain-name "{{ node.cluster }}..example.com"; 
             option domain-search "{{ node.cluster }}.example.com"; 
       }
     state: present

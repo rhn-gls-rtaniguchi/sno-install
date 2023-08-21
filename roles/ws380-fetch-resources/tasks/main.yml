@@ -13,6 +13,11 @@
     - "{{ ignitions_directory }}"
     - "/var/lib/tftpboot/pxelinux.cfg/"
 
+- name: Install dependency needed by coreos-installer
+  ansible.builtin.yum:
+    name: compat-openssl11
+    state: present
+
 
 # Downloads often fail ("handshake timed out" blabla) so do them first.
 - name: Download tools
@@ -24,7 +29,7 @@
     - openshift_install
     - butane
     - rhcos_inst
-
+    
 - name: Download RHCOS rootfs
   get_url:
     url: "{{ rhcos_rootfs_url }}"

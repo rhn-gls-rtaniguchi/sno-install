@@ -1,5 +1,5 @@
 variant: openshift
-version: 4.9.0
+version: 4.13.0
 metadata:
   name: 01-master-network-{{ node.network_adapter }}
   labels:
@@ -21,7 +21,9 @@ storage:
 
           [ipv4]
           address1={{ node.ip }}/24,172.25.254.250
+          dhcp-hostname=node
           dns=172.25.254.250;
+          may-fail=false
           method=manual
 
           [ipv6]
@@ -33,3 +35,20 @@ storage:
       contents:
         inline: |
           {{ node.name }}.{{ node.cluster }}.example.com
+systemd:
+  units:
+  - contents: |
+      [Unit]
+      Description=Wipe Boot Disk After BootKube Completes
+      Wants=bootkube.service
+      After=bootkube.service
+      ConditionPathExists=/opt/openshift/.bootkube.done
+
+      [Service]
+      WorkingDirectory=/
+      ExecStart=/bin/bash -c "/usr/sbin/wipefs -af {{ node.bootstrap_disk }} && /usr/sbin/reboot"
+
+      [Install]
+      WantedBy=multi-user.target
+    enabled: true
+    name: wipe-boot-dev.service

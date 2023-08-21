@@ -60,7 +60,6 @@ frontend k8s_api_ocp4
 backend k8s_api_backend_ocp4
     balance roundrobin
     mode tcp
-    server bootstrap {{ bootstrap.ip }}:6443 check
     server node {{ node.ip }}:6443 check
                     
 frontend machine_config_ocp4
@@ -71,7 +70,6 @@ frontend machine_config_ocp4
 backend machine_config_backend_ocp4
     balance roundrobin
     mode tcp
-    server bootstrap {{ bootstrap.ip }}:22623 check
     server node {{ node.ip }}:22623 check
 # END STATIC OCP4 CLUSTER HAPROXY CONFIG
                     

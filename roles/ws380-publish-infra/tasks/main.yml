@@ -129,6 +129,7 @@
     - 443/tcp
     - 22623/tcp
     - 32700/tcp
+    - 9000/tcp
   notify: restart_firewall
 
 

@@ -11,25 +11,20 @@
 # Create the OCP installation directory and populate it
 
 - name: Delete dirs
-  become: no
   file:
-    path: /home/kiosk/{{ item }}
+    path: "{{ item }}"
     state: absent
   loop: 
-    - "{{ node.cluster }}"
-    - tmp
+    - /home/kiosk/{{ node.cluster }}"
+    - /home/kiosk/tmp
+    - /var/lib/tftpboot/rhcos-initrd.img
 
 - name: Make sure dirs exists
   become: no
   file:
-    path: /home/kiosk/{{ item }}
+    path: /home/kiosk/{{ node.cluster }}
     state: directory
     mode: 0755
-  loop: 
-    - "{{ node.cluster }}"
-    - tmp
-
-
 
 - name: Place the install config to workdir
   become: no
@@ -37,7 +32,6 @@
     src: templates/install-config-sno.yaml.j2
     dest: /home/kiosk/{{ node.cluster }}/install-config.yaml
     mode: 0644
-
 
 - name: Create a backup copy of install config
   become: no
@@ -48,63 +42,60 @@
     mode: 0644
 
 
-- name: Create the ignition file
+- name: Create installation manifests
   become: no
-  shell: openshift-install create ignition-configs
+  shell: openshift-install create manifests
   args:
     chdir: /home/kiosk/{{ node.cluster }}
 
-- name: Move {{ item }} ignition files to tmp dir to process butane configurations
-  become: no
-  copy:
-    src: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
-    dest: /home/kiosk/tmp/{{ item }}.ign
-    remote_src: no
-    mode: 0644
-  loop:
-    - bootstrap
-    - master      
-- name: Delete {{ item }} ignition file
-  become: no
-  file:
-    state: absent
-    path: /home/kiosk/{{ node.cluster }}/{{ item }}.ign
-  loop:
-    - bootstrap
-    - master
-    - worker
-
-
-- name: Deploy the environment workarounds
+- name: Deploy the network config customization
   become: no
   template:
-    src: templates/{{ item }}.bu.j2
-    dest: /home/kiosk/{{ item }}.yaml
+    src: templates/netcfg.bu.j2
+    dest: /home/kiosk/netcfg.bu
     mode: 0644
-  loop:
-    - bootstrap
-    - master
 
-- name: Process {{ item }} config with butane
+- name: Process network config with butane
   become: no
-  shell: butane {{ item }}.yaml -d /home/kiosk/tmp -o /home/kiosk/{{ node.cluster }}/{{ item }}.ign  
+  shell: butane netcfg.bu -o {{ node.cluster }}/openshift/01-master-network.yaml
   args:
     chdir: /home/kiosk
-  loop:
-    - bootstrap
-    - master
 
-- name: Publish {{ item }} ignition configs
+- name: Create the ignition file
+  become: no
+  shell: openshift-install create single-node-ignition-config
+  args:
+    chdir: /home/kiosk/{{ node.cluster }}
+
+- name: Publish ignition configs
   copy:
-    src: /home/kiosk/tmp/{{ item }}.ign
-    dest: "{{ ignitions_directory }}"
+    src: /home/kiosk/{{ node.cluster }}/bootstrap-in-place-for-live-iso.ign
+    dest: "{{ ignitions_directory }}/{{ node.cluster }}-{{ node.name }}.ign"
     remote_src: yes
     mode: 0644
+    seuser: system_u
     owner: root
     group: root
-  loop:
-    - bootstrap
-    - master
+
+- name: Deploy the network config to connect
+  become: no
+  template:
+    src: templates/network.nmconnection.j2
+    dest: /home/kiosk/{{ node.network_adapter }}.nmconnection
+    mode: 0644
+
+- name: Create the custom initrd with network support
+  shell: coreos-installer pxe customize --dest-device {{ node.bootstrap_disk }} --dest-console tty0 --network-keyfile /home/kiosk/{{node.network_adapter}}.nmconnection -o /var/lib/tftpboot/rhcos-initrd.img /content/coreos/x86_64/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img 
+  args:
+    chdir: /home/kiosk/{{ node.cluster }}
+
+- name: Change custom initrd with network support
+  file: 
+    path: /var/lib/tftpboot/rhcos-initrd.img
+    mode: 0644
+    seuser: system_u
+
+
 
 # Create a backup copy of cluster auth files
 - name: Create a backup copy of cluster auth files

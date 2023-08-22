@@ -14,15 +14,6 @@
 # pcie_aspm=off pcie_port_pm=off to the linuxefi line
 
 
-- name: Deploy EFI config file
-  ansible.builtin.blockinfile:
-    insertafter: '# BEGIN ANSIBLE MANAGED DHCP CONFIG'
-    path: /var/lib/tftpboot/grub.cfg
-    block: |
-      menuentry 'Install Single Node OpenShift' --class fedora --class gnu-linux --class gnu --class os {
-      linuxefi rhcos-vmlinuz initrd=rhcos-initrd.img pcie_aspm=off pcie_port_pm=off rd.neednet=1 console=tty0 coreos.live.rootfs_url={{ images_url }}/rhcos-{{ rhcos_ver }}-x86_64-live-rootfs.x86_64.img random.trust_cpu=on ignition.firstboot ignition.platform.id=metal coreos.inst.ignition_url={{ ignitions_url }}/{{ node.cluster }}-{{ node.name }}.ign
-      initrdefi rhcos-initrd.img
-      } 
 
 
 - name: Publish forward DNS zone

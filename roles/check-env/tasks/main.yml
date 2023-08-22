@@ -26,7 +26,6 @@
     - named
     - chronyd
     - httpd
-    - haproxy
 
 - name: Make sure all the tools are there
   file:

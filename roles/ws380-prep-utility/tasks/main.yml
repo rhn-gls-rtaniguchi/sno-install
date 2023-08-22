@@ -9,59 +9,10 @@
       - kubectl
     remote_src: yes
 
-- name: Extract "openshift-install"
-  ansible.builtin.unarchive:
-    src: "{{ binaries_directory }}/{{ tools.openshift_install.bin }}"
-    dest: /usr/local/bin/
-    exclude:
-      - README.md
-    remote_src: yes
-
 - name: Copy coreos-installer into its place
   ansible.builtin.copy:
     src: "{{ binaries_directory }}/{{ tools.rhcos_inst.bin }}"
     dest: /usr/local/bin/coreos-installer
-    remote_src: yes
-    owner: root
-    group: root
-    mode: 0755
-
-
-# Deploy butane
-- name: Copy butane into its place
-  ansible.builtin.copy:
-    src: "{{ binaries_directory }}/{{ tools.butane.bin }}"
-    dest: /usr/local/bin/butane
-    remote_src: yes
-    owner: root
-    group: root
-    mode: 0755
-
-
-# Copy files into the tftp server
-- name: Copy kernel into tftp
-  ansible.builtin.copy:
-    src: "{{ images['kernel']['download']}}"
-    dest: "{{ images['kernel']['dest']}}"
-    remote_src: yes
-    owner: root
-    group: root
-    mode: 0755
-
-# Copy files into the tftp server
-- name: Copy initramfs into tftp
-  ansible.builtin.copy:
-    src: "{{ images['initramfs']['download']}}"
-    dest: "{{ images['initramfs']['dest']}}"
-    remote_src: yes
-    owner: root
-    group: root
-    mode: 0755
-# Copy files into the tftp server
-- name: Copy rootfs into tftp
-  ansible.builtin.copy:
-    src: "{{ images['rootfs']['download']}}"
-    dest: "{{ images['rootfs']['dest']}}"
     remote_src: yes
     owner: root
     group: root

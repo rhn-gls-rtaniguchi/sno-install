@@ -1,17 +1,10 @@
 ---
 binaries_directory: /content/binaries/
 images_directory: /content/coreos/x86_64/
-tftpboot_directory: /var/lib/tftpboot
 
 tools:
   oc:
     bin: "openshift-client-{{ ocp_z }}-linux-x86_64.tar.gz"
-
-  openshift_install:
-    bin: "openshift-install-{{ ocp_z }}-linux-x86_64.tar.gz"
-
-  butane:
-    bin: "butane-{{ butane_ver }}-linux-x86_64"
 
   rhcos_inst:
     bin: "coreos-installer-{{ cinst_ver }}-linux-x86_64"

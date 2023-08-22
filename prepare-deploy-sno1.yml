@@ -13,9 +13,6 @@
       network_adapter: enp2s0
       role: SNO
       cluster: sno1
-      # adjust your disk accordingly  
-      bootstrap_disk: /dev/sda
-      temp_disk: /dev/nvme0n1
   pre_tasks:
     - name: Put the pull-secret onto kiosk VM
       become: no

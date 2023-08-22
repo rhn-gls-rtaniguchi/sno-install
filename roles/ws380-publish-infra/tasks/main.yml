@@ -50,12 +50,6 @@
   notify:
     - restart_dhcpd
 
-- name: Backup stale grub.cfg from default config
-  copy:
-    src: /var/lib/tftpboot/grub.cfg-foundation
-    dest: /var/lib/tftpboot/grub.cfg-f0.bkp
-    remote_src: true
-
 - name: Publish base grub.cfg
   copy:
     src: files/grub.cfg-foundation
@@ -144,21 +138,6 @@
   notify: restart_haproxy
 
   
-# pxe boot config
-# - name: Publish default PXE configuration file
-#   copy:
-#     src: files/default-pxe-config
-#     dest: /var/lib/tftpboot/pxelinux.cfg/ocp4-default-pxe
-#     mode: 0644
-#     owner: root
-#     group: root
-
-# - name: Update symlink to the new PXE configuration file
-#   file:
-#     path: /var/lib/tftpboot/pxelinux.cfg/default
-#     src: /var/lib/tftpboot/pxelinux.cfg/ocp4-default-pxe
-#     state: link
-
 - name: Make sure tftp.socket is enabled
   service:
     name: tftp.socket

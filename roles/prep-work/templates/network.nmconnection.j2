@@ -1,0 +1,15 @@
+[connection]
+id={{ node.network_adapter }}
+type=ethernet
+interface-name={{ node.network_adapter }}
+
+[ethernet]
+mtu=1500
+
+[ipv4]
+address1={{ node.ip }}/24,172.25.254.250
+dns=172.25.254.250;
+gateway=172.25.254.250
+may-fail=false
+method=manual
+

@@ -15,7 +15,7 @@
     path: "{{ item }}"
     state: absent
   loop: 
-    - /home/kiosk/{{ node.cluster }}"
+    - /home/kiosk/{{ node.cluster }}
     - /home/kiosk/tmp
     - /var/lib/tftpboot/rhcos-initrd.img
 
@@ -48,6 +48,21 @@
   args:
     chdir: /home/kiosk/{{ node.cluster }}
 
+
+- name: Deploy the workaround
+  become: no
+  template:
+    src: templates/workaround.bu.j2
+    dest: /home/kiosk/workaround.bu
+    mode: 0644
+
+- name: Process network config with butane
+  become: no
+  shell: butane workaround.bu -o {{ node.cluster }}/openshift/02-bootstrap-workaround.yaml
+  args:
+    chdir: /home/kiosk
+
+
 - name: Deploy the network config customization
   become: no
   template:
@@ -55,11 +70,14 @@
     dest: /home/kiosk/netcfg.bu
     mode: 0644
 
+
 - name: Process network config with butane
   become: no
   shell: butane netcfg.bu -o {{ node.cluster }}/openshift/01-master-network.yaml
   args:
     chdir: /home/kiosk
+
+
 
 - name: Create the ignition file
   become: no

@@ -6,6 +6,20 @@ metadata:
     machineconfiguration.openshift.io/role: master
 storage:
   files:
+    - path: /etc/zincati/config.d/90-disable-feature.toml
+      mode: 0644
+      contents:
+        inline: |
+          [updates]
+          enabled = false
+    - path: /etc/systemd/network/25-{{ node.network_adapter }}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          MACAddress={{ node.mac | replace('-',':') }}
+          [Link]
+          Name={{ node.network_adapter }}
     - path: /etc/NetworkManager/system-connections/{{ node.network_adapter }}.nmconnection
       mode: 0600
       overwrite: true
@@ -17,6 +31,7 @@ storage:
           interface-name={{ node.network_adapter }}
 
           [ethernet]
+          mac-address={{ node.mac | replace('-',':') }}
           mtu=1500
 
           [ipv4]
@@ -26,15 +41,28 @@ storage:
           may-fail=false
           method=manual
 
-          [ipv6]
-          method=disabled
-
     - path: /etc/hostname
       mode: 0644
       overwrite: true
       contents:
         inline: |
           {{ node.name }}.{{ node.cluster }}.example.com
+
+    - path: /etc/chrony.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          pool {{ node.ip }} iburst 
+          driftfile /var/lib/chrony/drift
+          makestep 1.0 3
+          rtcsync
+          logdir /var/log/chrony
+#    - path: /opt/openshift/openshift/98_openshift-machineconfig_98-master-config-bip.yaml
+#      mode: 0644
+#      overwrite: true
+#      contents:
+#        source: data:text/plain;base64,{{ lookup('file','/home/kiosk/98_openshift-machineconfig_98-master-config-bip.yaml') | b64encode }}
 systemd:
   units:
   - contents: |

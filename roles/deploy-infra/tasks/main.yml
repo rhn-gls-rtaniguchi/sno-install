@@ -58,8 +58,6 @@
     state: present
   register: zoneupdate
 
-
-
 - name: Extract the serial if rzone was updated
   shell: grep -i serial /var/named/254.25.172.in-addr.arpa.zone | awk '{ print $1 }'
   register: rzone_serial_result

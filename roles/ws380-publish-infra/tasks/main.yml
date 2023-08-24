@@ -50,13 +50,6 @@
   notify:
     - restart_dhcpd
 
-- name: Publish base grub.cfg
-  copy:
-    src: files/grub.cfg-foundation
-    dest: /var/lib/tftpboot/grub.cfg-foundation
-    mode: 0644
-    owner: root
-
 - name: Change HTTPD port
   ansible.builtin.lineinfile:
     path: /etc/httpd/conf/httpd.conf
@@ -136,12 +129,6 @@
     owner: root
     group: root
   notify: restart_haproxy
-
-  
-- name: Make sure tftp.socket is enabled
-  service:
-    name: tftp.socket
-    enabled: yes
 
 
 

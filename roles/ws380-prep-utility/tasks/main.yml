@@ -24,13 +24,9 @@
     argv:
       - /bin/bash
       - -c
-      - "{{ item }} completion bash > /etc/bash_completion.d/{{ item }}.completion"
+      - "oc completion bash > /etc/bash_completion.d/oc.completion"
   args:
-    creates: /etc/bash_completion.d/{{ item }}
-  loop:
-    - oc
-    - openshift-install
-
-  
+    creates: /etc/bash_completion.d/oc
+ 
 
 ...

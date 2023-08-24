@@ -16,27 +16,6 @@
     state: absent
   loop: 
     - /home/kiosk/{{ node.cluster }}
-    - /home/kiosk/tmp
-    - /var/lib/tftpboot/rhcos-initrd.img
-
-- name: Deploy the network config to connect
-  become: no
-  template:
-    src: templates/network.nmconnection.j2
-    dest: /home/kiosk/{{ node.network_adapter }}.nmconnection
-    mode: 0644
-
-- name: Create the custom initrd with network support
-  shell: coreos-installer pxe customize --dest-device {{ node.bootstrap_disk }} --dest-console tty0 --network-keyfile /home/kiosk/{{node.network_adapter}}.nmconnection -o /var/lib/tftpboot/rhcos-initrd.img /content/coreos/x86_64/rhcos-{{ rhcos_ver }}-x86_64-live-initramfs.x86_64.img 
-  args:
-    chdir: /home/kiosk/{{ node.cluster }}
-
-- name: Change custom initrd with network support
-  file: 
-    path: /var/lib/tftpboot/rhcos-initrd.img
-    mode: 0644
-    seuser: system_u
-
 
 
 ...

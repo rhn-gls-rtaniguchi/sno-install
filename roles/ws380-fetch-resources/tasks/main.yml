@@ -26,24 +26,7 @@
     dest: "{{ binaries_directory }}/{{ tools[item].bin }}"
   loop:
     - oc
-    - openshift_install
-    - butane
     - rhcos_inst
     
-- name: Download RHCOS rootfs
-  get_url:
-    url: "{{ rhcos_rootfs_url }}"
-    dest: "{{ images_directory }}"
-
-- name: Download RHCOS kernel
-  get_url:
-    url: "{{ rhcos_kernel_url }}"
-    dest: "{{ images_directory }}"
-
-- name: Download RHCOS initramfs
-  get_url:
-    url: "{{ rhcos_initramfs_url }}"
-    dest: "{{ images_directory }}"
-
     
 ...

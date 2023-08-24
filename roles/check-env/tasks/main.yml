@@ -29,10 +29,7 @@
 
 - name: Make sure all the tools are there
   file:
-    path: /usr/local/bin/{{ item }}
+    path: /usr/local/bin/oc
     state: file
-  loop:
-    - openshift-install
-    - butane
-    - oc
+  
 ...

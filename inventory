@@ -1,4 +1,5 @@
-foundation0.example.com ansible_user=kiosk
+[routers]
+openwrt
 
 # Example: override variables here.
 [all:vars]

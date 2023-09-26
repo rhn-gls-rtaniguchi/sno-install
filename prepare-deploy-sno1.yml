@@ -1,9 +1,12 @@
 ---
-- name: Prepare the utility VM for deployment of SNO1 cluster
-  hosts: default
+- name: Prepare router for deployment of SNO1 cluster
+  hosts: routers
   become: true
   gather_facts: false
   vars:
+    ansible_user: root
+    openwrt_system_zonename: America/New_York
+    openwrt_system_hostname: router
     node: 
       name: node
       ip: 192.168.50.18
@@ -13,20 +16,22 @@
       cluster: sno1
       online: yes
   roles:
-    - role: ws380-cleanup
-      tags: cleanup
-    - role: ws380-fetch-resources
-      tags: fetch
-    - role: ws380-prep-utility
-      tags: prep
-    - role: ws380-publish-infra
+    # - role: ws380-cleanup
+    #   tags: cleanup
+    # - role: ws380-fetch-resources
+    #   tags: fetch
+    # - role: ws380-prep-utility
+    #   tags: prep
+    - role: openwrt-prep-work
+      tags: prep    
+    - role: openwrt-publish-infra
       tags: publish
-    - role: check-env
-      tags: check
-    - role: deploy-infra
-      tags: infra
-    - role: prep-work
-      tags: prep
+    # - role: check-env
+    #   tags: check
+    # - role: deploy-infra
+    #   tags: infra
+    # - role: prep-work
+    #   tags: prep
   post_tasks:
     - name: Notify of completion
       pause:

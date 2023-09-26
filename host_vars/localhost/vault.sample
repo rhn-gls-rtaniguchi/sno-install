@@ -1,0 +1,4 @@
+# Rename this file to vault and add your user's localhost password here. 
+# Run ansible-vault create to generate the correspondent vaulted key
+# It is supposed to have sudo permissions as Ansible requires you to do so.
+ansible_become_password: xxxxxxxxx

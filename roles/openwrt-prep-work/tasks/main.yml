@@ -1,0 +1,33 @@
+---
+# Create config file for the factory reset router
+
+- name: Add directory to store SSH config file
+  delegate_to: localhost
+  become: false
+  ansible.builtin.file:
+    path: ~/.ssh/config.d
+    state: directory
+
+- name: Add new config.d directory to the standard SSH config file
+  delegate_to: localhost
+  become: false
+  ansible.builtin.lineinfile:
+    path: ~/.ssh/config
+    line: "include ~/.ssh/config.d/*.conf"
+    state: present
+
+- name: Check localhost facts
+  delegate_to: localhost
+  ansible.builtin.setup:
+
+- name: Change Permissions to allow running on fedora
+  delegate_to: localhost
+  ansible.builtin.shell: update-crypto-policies --set DEFAULT:FEDORA32
+  when: ansible_distribution=='RedHat' or ansible_distribution=='Fedora'
+
+- name: Create SSH config file to a factory reset router
+  become: false
+  delegate_to: localhost
+  ansible.builtin.copy:
+    src: openwrt.conf
+    dest: ~/.ssh/config.d/openwrt.conf

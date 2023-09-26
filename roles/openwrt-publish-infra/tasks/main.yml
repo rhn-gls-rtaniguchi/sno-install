@@ -1,5 +1,14 @@
 ---
-# DNS configuration
+# Network Configuration
+
+- name: Configure network on the router
+  import_role: 
+    name: nn708.openwrt.network
+
+- name: Configure DHCP server configuration
+  import_role: 
+    name: nn708.openwrt.dhcp
+
 - name: Remove stale zone files from default config
   file:
     path: /var/named/{{ item }}

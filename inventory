@@ -1,5 +1,5 @@
-[routers]
-openwrt
+[openwrt]
+router
 
 # Example: override variables here.
 [all:vars]
@@ -8,4 +8,9 @@ ocp_z = "4.9.23"
 rhcos_ver = "4.9.0"
 cinst_ver = latest
 butane_ver = latest
-
+openwrt_system_zonename = America/New_York
+openwrt_system_hostname = router
+openwrt_network_lan_ipaddr = 172.25.254.250
+openwrt_network_lan_netmask = 255.255.255.0
+openwrt_dnsmasq_server = 8.8.8.8
+openwrt_scp_if_ssh = smart

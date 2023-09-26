@@ -29,5 +29,5 @@
   become: false
   delegate_to: localhost
   ansible.builtin.copy:
-    src: openwrt.conf
-    dest: ~/.ssh/config.d/openwrt.conf
+    src: router.conf
+    dest: ~/.ssh/config.d/router.conf

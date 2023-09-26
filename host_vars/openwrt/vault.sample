@@ -1,4 +1,0 @@
-# Rename this file to vault and add the root password from your openwrt router here. 
-# Run ansible-vault create to generate the correspondent vaulted key
-# It is supposed to have sudo permissions as Ansible requires you to do so.
-ansible_ssh_password: xxxxxxxxx

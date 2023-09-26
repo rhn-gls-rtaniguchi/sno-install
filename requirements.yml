@@ -1,3 +1,7 @@
 ---
+roles: 
+  - name: gekmihesg.openwrt
+    src: https://github.com/gekmihesg/ansible-openwrt/archive/master.tar.gz
+
 collections:
   - name: nn708.openwrt

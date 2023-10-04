@@ -16,3 +16,4 @@ inventory.sample
 
 host_vars/openwrt/vault
 host_vars/localhost/vault
+host_vars/router/vault

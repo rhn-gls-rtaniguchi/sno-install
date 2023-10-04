@@ -1,4 +1,31 @@
 ---
+- name: start fstab
+  community.general.openwrt_init: 
+    name: fstab
+    enabled: true
+    state: started
+- name: uci commit
+  uci:
+    command: commit
+
+- name: restart portmap
+  community.general.openwrt_init: 
+    name: portmap
+    enabled: true
+    state: started
+
+- name: restart nfsd
+  community.general.openwrt_init: 
+    name: nfsd
+    enabled: true
+    state: started
+
+- name: restart dnsmasq
+  community.general.openwrt_init: 
+    name: dnsmasq
+    enabled: true
+    state: restarted
+
 - name: reload_named
   service:
     name: named

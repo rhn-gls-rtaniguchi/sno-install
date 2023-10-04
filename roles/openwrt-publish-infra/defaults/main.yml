@@ -1,0 +1,21 @@
+---
+ssh_auth:
+  PasswordAuth: 'off'
+  RootPasswordAuth: 'off'
+mntpoint:
+  target: /mnt/extstorage
+  device: /dev/sda1
+  options: noatime,nodiratime
+  enabled: 1
+dnsmasq:
+  domain: ocp4.example.com
+  localuse: 0
+  cachelocal: 0
+  port: 0
+dhcpd:
+  leasetime: 5m
+  start: 225
+  limit: 30
+dhcp_option:
+  - 6
+  - 192.168.8.1

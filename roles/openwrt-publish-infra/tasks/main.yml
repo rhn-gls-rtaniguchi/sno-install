@@ -1,90 +1,166 @@
 ---
 # Network Configuration
 
-- name: Configure network on the router
-  import_role: 
-    name: nn708.openwrt.network
+- name: enable passwordless authentication
+  uci: 
+    command: set
+    key: "dropbear.@dropbear[0].{{ item.key }}"
+    value: "{{ item.value }}"
+  with_dict: "{{ ssh_auth }}"
 
-- name: Configure DHCP server configuration
-  import_role: 
-    name: nn708.openwrt.dhcp
 
-- name: Remove stale zone files from default config
-  file:
-    path: /var/named/{{ item }}
-    state: absent
+- name: add instructor's public key into dropbear authorized keys
+  ansible.builtin.blockinfile: 
+    path: /etc/dropbear/authorized_keys
+    create: true
+    block: |
+      {{ lookup('file', '{{ instructor_ssh_pubkey }}') }}
+
+- name: update opkg cache
+  opkg: 
+    name: '{{ item }}'
   loop:
-    - ocp4.example.com.db
-    - ocp4.example.com.reverse.db
+  - kmod-usb-storage
+  - block-mount
+  - uhttpd
+  ignore_errors: true
 
-- name: Publish base named.conf
-  copy:
-    src: files/named.conf
-    dest: /etc/named.conf
-    mode: 0640
-    owner: root
-    group: named
+- name: Create /mnt/extstorage directory to store TFTP files
+  ansible.builtin.file: 
+    path: /mnt/extstorage
+    state: directory
+
+- name: Delete mountpoint configuration in fstab if exists 
+  uci: 
+    command: delete
+    key: fstab.@mount[0]
+  ignore_errors: true
+
+- name: Create mountpoint in fstab
+  uci: 
+    command: add
+    key: fstab
+    value: mount
+
+- name: Configure mountpoint in fstab
+  uci: 
+    command: set
+    key: "fstab.@mount[0].{{ item.key }}"
+    value: "{{ item.value }}"
+  with_dict: "{{ mntpoint }}"
   notify:
-    - reload_named
+    - start fstab
 
-- name: Publish base forward and reverse zones
-  copy:
-    src: files/{{ item }}.zone
-    dest: /var/named/{{ item }}.zone
-    mode: 0640
-    owner: root
-    group: named
-  loop:
-    - ocp4.example.com
-    - 50.168.192.in-addr.arpa
+- name: Reboot router to persist directories
+  ansible.builtin.reboot: 
+    reboot_timeout: 120
+    reboot_command: reboot
+    test_command: ping -c 2 localhost
 
-- name: Configure DNS to load the published zones
-  lineinfile:
-    path: /etc/named.conf
-    insertafter: "^# BEGIN ANSIBLE MANAGED DNS ZONES$"
-    line: 'zone "{{ item }}" { type master; file "{{ item }}.zone"; allow-update { none; }; };'
-    state: present
-  loop:
-    - ocp4.example.com
-    - 50.168.192.in-addr.arpa
-  notify:
-    - reload_named
+- name: Create /mnt/extstorage directory to store TFTP files
+  ansible.builtin.file: 
+    path: "/mnt/extstorage/tftp"
+    state: directory
+
+- name: Configure DNSmasq to support TFTP
+  uci: 
+    command: set
+    key: "dhcp.@dnsmasq[0].{{ item.key }}"
+    value: "{{ item.value }}"
+  with_dict: "{{ dnsmasq }}"
+
+- name: Configure DHCP lease times
+  uci: 
+    command: set
+    key: "dhcp.lan.{{ item.key }}"
+    value: "{{ item.value }}"
+  with_dict: "{{ dhcpd }}"
 
 
-# chronyd fixes
-- name: Make sure chronyd is allowing time sync
-  lineinfile:
-    path: /etc/chrony.conf
-    line: "allow 192.168.50.0/24"
-    regexp: "^#?allow 192.168.*$"
-    state: present
-  notify:
-    - restart_chronyd
+- name: Configure DHCP lease times
+  uci: 
+    command: add_list
+    key: "dhcp.lan.dhcp_option"
+    value: "{{ item }}"
+  with_dict: "{{ dhcp_option }}"
 
-# dhcpd configuration
-- name: Publish base dhcpd.conf
-  copy:
-    src: files/dhcpd.conf
-    dest: /etc/dhcp/dhcpd.conf
-    mode: 0644
-    owner: root
-    group: root
-  notify:
-    - restart_dhcpd
 
-# pxe boot config
-- name: Publish default PXE configuration file
-  copy:
-    src: files/default-pxe-config
-    dest: /var/lib/tftpboot/pxelinux.cfg/default
-    mode: 0644
-    owner: root
-    group: root
+# - name: Remove stale zone files from default config
+#   file:
+#     path: /var/named/{{ item }}
+#     state: absent
+#   loop:
+#     - ocp4.example.com.db
+#     - ocp4.example.com.reverse.db
 
-- name: Make sure tftp.socket is enabled
-  service:
-    name: tftp.socket
-    enabled: yes
+# - name: Publish base named.conf
+#   copy:
+#     src: files/named.conf
+#     dest: /etc/named.conf
+#     mode: 0640
+#     owner: root
+#     group: named
+#   notify:
+#     - reload_named
+
+# - name: Publish base forward and reverse zones
+#   copy:
+#     src: files/{{ item }}.zone
+#     dest: /var/named/{{ item }}.zone
+#     mode: 0640
+#     owner: root
+#     group: named
+#   loop:
+#     - ocp4.example.com
+#     - 50.168.192.in-addr.arpa
+
+# - name: Configure DNS to load the published zones
+#   lineinfile:
+#     path: /etc/named.conf
+#     insertafter: "^# BEGIN ANSIBLE MANAGED DNS ZONES$"
+#     line: 'zone "{{ item }}" { type master; file "{{ item }}.zone"; allow-update { none; }; };'
+#     state: present
+#   loop:
+#     - ocp4.example.com
+#     - 50.168.192.in-addr.arpa
+#   notify:
+#     - reload_named
+
+
+# # chronyd fixes
+# - name: Make sure chronyd is allowing time sync
+#   lineinfile:
+#     path: /etc/chrony.conf
+#     line: "allow 192.168.50.0/24"
+#     regexp: "^#?allow 192.168.*$"
+#     state: present
+#   notify:
+#     - restart_chronyd
+
+# # dhcpd configuration
+# - name: Publish base dhcpd.conf
+#   copy:
+#     src: files/dhcpd.conf
+#     dest: /etc/dhcp/dhcpd.conf
+#     mode: 0644
+#     owner: root
+#     group: root
+#   notify:
+#     - restart_dhcpd
+
+# # pxe boot config
+# - name: Publish default PXE configuration file
+#   copy:
+#     src: files/default-pxe-config
+#     dest: /var/lib/tftpboot/pxelinux.cfg/default
+#     mode: 0644
+#     owner: root
+#     group: root
+
+# - name: Make sure tftp.socket is enabled
+#   service:
+#     name: tftp.socket
+#     enabled: yes
 
 
 

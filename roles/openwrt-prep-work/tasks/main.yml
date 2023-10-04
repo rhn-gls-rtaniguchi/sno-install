@@ -28,6 +28,6 @@
 - name: Create SSH config file to a factory reset router
   become: false
   delegate_to: localhost
-  ansible.builtin.copy:
-    src: router.conf
+  ansible.builtin.template:
+    src: router.conf.j2
     dest: ~/.ssh/config.d/router.conf

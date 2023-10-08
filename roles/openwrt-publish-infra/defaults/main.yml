@@ -9,13 +9,17 @@ mntpoint:
   enabled: 1
 dnsmasq:
   domain: ocp4.example.com
-  localuse: 0
-  cachelocal: 0
-  port: 0
+  enable_tftp: 1
+  tftp_root: /mnt/extorage/tftp
 dhcpd:
   leasetime: 5m
   start: 225
   limit: 30
-dhcp_option:
-  - 6
-  - 192.168.8.1
+bootp:
+  filename: pxelinux.0
+  serveraddress: 192.168.8.1
+  servername: router
+  force: 1
+dhcp_option: 
+  - 209,pxelinux.cfg/default
+  - 6,192.168.8.1

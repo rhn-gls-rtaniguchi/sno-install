@@ -1,0 +1,8 @@
+default vesamenu.c32
+prompt 0
+timeout 86400
+menu title **** THIS HOST IS UNCONFIGURED ****
+
+label See corresponding exercise to configure this host.
+    kernel /foo
+

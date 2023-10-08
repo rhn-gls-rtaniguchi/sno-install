@@ -7,9 +7,9 @@
     openwrt_system_hostname: router
     openwrt_system_zonename: America/New_York
     # Put your own public key file location here
-    instructor_ssh_pubkey: ~/.ssh/f0_id_rsa.pub
+    instructor_ssh_pubkey: ~/.ssh/github_work_rsa.pub
     # Put your own private key file location here
-    instructor_ssh_privkey: ~/.ssh/f0_id_rsa
+    instructor_ssh_privkey: ~/.ssh/github_work_rsa
     node: 
       name: node
       ip: 192.168.50.18
@@ -25,9 +25,9 @@
     #   tags: fetch
     # - role: ws380-prep-utility
     #   tags: prep
-    - role: nn708.openwrt.system
     - role: openwrt-prep-work
       tags: prep    
+    - role: nn708.openwrt.system
     - role: openwrt-publish-infra
       tags: publish
     # - role: check-env

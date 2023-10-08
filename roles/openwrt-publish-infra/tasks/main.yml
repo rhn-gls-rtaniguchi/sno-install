@@ -6,7 +6,7 @@
     command: set
     key: "dropbear.@dropbear[0].{{ item.key }}"
     value: "{{ item.value }}"
-  with_dict: "{{ ssh_auth }}"
+  with_dict: "{{ ssh_auth }}" 
 
 
 - name: add instructor's public key into dropbear authorized keys
@@ -22,7 +22,8 @@
   loop:
   - kmod-usb-storage
   - block-mount
-  - uhttpd
+  - wget 
+  - tar
   ignore_errors: true
 
 - name: Create /mnt/extstorage directory to store TFTP files
@@ -61,6 +62,37 @@
   ansible.builtin.file: 
     path: "/mnt/extstorage/tftp"
     state: directory
+  loop:
+    - /mnt/extstorage/tftp/
+    - /mnt/extstorage/tftp/pxelinux.cfg
+
+- name: Download syslinux files
+  local_action:
+    module: ansible.builtin.get_url
+    url: https://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
+    dest: /tmp/
+
+- name: Decompress pxeboot files from syslinux
+  local_action:
+    module: ansible.builtin.unarchive
+    src: /tmp/syslinux-6.03.tar.gz
+    dest: /tmp
+
+- name: Copy files to the remote host
+  ansible.builtin.copy: 
+    src: /tmp/syslinux-6.03/bios/{{ item }}
+    dest: /mnt/extstorage/tftp/
+  loop: 
+  - core/pxelinux.0 
+  - com32/elflink/ldlinux/ldlinux.c32 
+  - com32/menu/vesamenu.c32 
+  - com32/lib/libcom32.c32 
+  - com32/libutil/libutil.c32
+
+- name: Copy Menu file to the router
+  ansible.builtin.copy: 
+    src: default
+    dest: /mnt/extstorage/tftp/
 
 - name: Configure DNSmasq to support TFTP
   uci: 
@@ -77,13 +109,31 @@
   with_dict: "{{ dhcpd }}"
 
 
-- name: Configure DHCP lease times
+- name: Remove BOOTP if it exists
+  uci: 
+    command: delete
+    key: "dhcp.boot"
+  ignore_errors: true
+
+- name: Configure BOOTP
+  uci: 
+    command: set
+    key: "dhcp.boot"
+    value: "linux"
+
+- name: Configure BOOTP
+  uci: 
+    command: set
+    key: "dhcp.boot.{{ item.key }}"
+    value: "{{ item.value }}"
+  with_dict: "{{ bootp }}"
+
+- name: Configure DHCP options
   uci: 
     command: add_list
     key: "dhcp.lan.dhcp_option"
     value: "{{ item }}"
-  with_dict: "{{ dhcp_option }}"
-
+  loop: "{{ dhcp_option }}"
 
 # - name: Remove stale zone files from default config
 #   file:

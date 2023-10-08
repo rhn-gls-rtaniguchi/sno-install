@@ -15,6 +15,7 @@
     path: ~/.ssh/config
     line: "include ~/.ssh/config.d/*.conf"
     state: present
+    create: true
 
 - name: Check localhost facts
   delegate_to: localhost

@@ -5,16 +5,13 @@ ssh_auth:
 mntpoint:
   target: /mnt/extstorage
   device: /dev/sda1
-  options: noatime,nodiratime
+  enabled_fsck: 0
   enabled: 1
 dnsmasq:
   domain: ocp4.example.com
   enable_tftp: 1
-  tftp_root: /mnt/extorage/tftp
-dhcpd:
-  leasetime: 5m
-  start: 225
-  limit: 30
+  tftp_root: /mnt/extstorage/tftp
+  dhcp_boot: pxelinux.0
 bootp:
   filename: pxelinux.0
   serveraddress: 192.168.8.1

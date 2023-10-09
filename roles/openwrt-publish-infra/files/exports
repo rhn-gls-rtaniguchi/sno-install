@@ -1,0 +1,1 @@
+/mnt/extstorage/tftp/disks  *(ro,async,no_subtree_check)

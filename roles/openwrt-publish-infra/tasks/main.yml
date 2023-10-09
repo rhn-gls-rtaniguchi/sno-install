@@ -30,6 +30,9 @@
   ansible.builtin.file: 
     path: /mnt/extstorage
     state: directory
+    group: nogroup
+    owner: nobody
+    mode: "0755"
 
 - name: Delete mountpoint configuration in fstab if exists 
   uci: 
@@ -60,17 +63,34 @@
 
 - name: Create /mnt/extstorage directory to store TFTP files
   ansible.builtin.file: 
-    path: "/mnt/extstorage/tftp"
+    path: "{{ item }}"
     state: directory
+    group: nogroup
+    owner: nobody
+    mode: "0755"
   loop:
     - /mnt/extstorage/tftp/
     - /mnt/extstorage/tftp/pxelinux.cfg
+    - /mnt/extstorage/tftp/disks
+
+- name: Copy NFS exports
+  ansible.builtin.copy: 
+    src: exports
+    dest: /etc/exports
+
+- name: Reboot router to persist directories
+  ansible.builtin.reboot: 
+    reboot_timeout: 120
+    reboot_command: reboot
+    test_command: ping -c 2 localhost
 
 - name: Download syslinux files
   local_action:
     module: ansible.builtin.get_url
     url: https://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.03.tar.gz
     dest: /tmp/
+    validate_certs: false
+    
 
 - name: Decompress pxeboot files from syslinux
   local_action:
@@ -92,7 +112,7 @@
 - name: Copy Menu file to the router
   ansible.builtin.copy: 
     src: default
-    dest: /mnt/extstorage/tftp/
+    dest: /mnt/extstorage/tftp/pxelinux.cfg/
 
 - name: Configure DNSmasq to support TFTP
   uci: 
@@ -100,14 +120,6 @@
     key: "dhcp.@dnsmasq[0].{{ item.key }}"
     value: "{{ item.value }}"
   with_dict: "{{ dnsmasq }}"
-
-- name: Configure DHCP lease times
-  uci: 
-    command: set
-    key: "dhcp.lan.{{ item.key }}"
-    value: "{{ item.value }}"
-  with_dict: "{{ dhcpd }}"
-
 
 - name: Remove BOOTP if it exists
   uci: 
@@ -131,7 +143,7 @@
 - name: Configure DHCP options
   uci: 
     command: add_list
-    key: "dhcp.lan.dhcp_option"
+    key: "dhcp.boot.dhcp_option"
     value: "{{ item }}"
   loop: "{{ dhcp_option }}"
 
